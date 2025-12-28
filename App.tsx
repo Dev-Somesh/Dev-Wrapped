@@ -11,6 +11,7 @@ import AIInsightsSlide from './components/AIInsightsSlide';
 import NarrativeSummary from './components/NarrativeSummary';
 import ArchetypeReveal from './components/ArchetypeReveal';
 import ShareCard from './components/ShareCard';
+import ActivityManifest from './components/ActivityManifest';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<Step>(Step.Entry);
@@ -71,21 +72,31 @@ const App: React.FC = () => {
       case Step.Archetype:
         return insights && <ArchetypeReveal insights={insights} onNext={nextStep} onBack={prevStep} />;
       case Step.Share:
-        return stats && insights && <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />;
+        return stats && insights && (
+          <div className="w-full flex flex-col items-center pt-12 pb-24 no-scrollbar">
+            <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />
+            <ActivityManifest stats={stats} />
+          </div>
+        );
       default:
         return <Landing onConnect={startAnalysis} error={error} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-[#c9d1d9] overflow-hidden flex flex-col items-center justify-center relative transition-colors duration-1000">
+    <div className={`min-h-screen bg-[#0d1117] text-[#c9d1d9] flex flex-col items-center justify-center relative transition-colors duration-1000 ${step === Step.Share ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+      
       {/* Dynamic Background */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 transition-all duration-[3000ms]">
+      <div className="fixed inset-0 pointer-events-none opacity-20 transition-all duration-[3000ms] z-0">
         <div className={`absolute -top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full blur-[160px] transition-colors duration-[2000ms] ${step >= Step.Stats ? 'bg-purple-900/30' : 'bg-blue-900/20'}`}></div>
         <div className={`absolute -bottom-1/4 -right-1/4 w-[800px] h-[800px] rounded-full blur-[160px] transition-colors duration-[2000ms] ${step >= Step.Narrative ? 'bg-blue-900/30' : 'bg-purple-900/20'}`}></div>
       </div>
       
-      <main className="w-full max-w-5xl px-6 z-10 flex flex-col items-center justify-center min-h-screen">
+      <main className="w-full max-w-5xl px-6 z-10 flex flex-col items-center justify-center min-h-screen relative">
         {renderStep()}
       </main>
 
