@@ -11,7 +11,7 @@ import AIInsightsSlide from './components/AIInsightsSlide';
 import NarrativeSummary from './components/NarrativeSummary';
 import ArchetypeReveal from './components/ArchetypeReveal';
 import ShareCard from './components/ShareCard';
-import ActivityManifest from './components/ActivityManifest';
+import DevelopmentDossier from './components/DevelopmentDossier';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<Step>(Step.Entry);
@@ -75,7 +75,7 @@ const App: React.FC = () => {
         return stats && insights && (
           <div className="w-full flex flex-col items-center pt-12 pb-24 no-scrollbar">
             <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />
-            <ActivityManifest stats={stats} />
+            <DevelopmentDossier stats={stats} insights={insights} />
           </div>
         );
       default:

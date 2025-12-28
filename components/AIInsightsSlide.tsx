@@ -19,15 +19,15 @@ const AIInsightsSlide: React.FC<AIInsightsSlideProps> = ({ insights, onNext, onB
         <p className="text-[#8b949e] italic font-light">Interpreting your journey through AI.</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {insights.insights.map((insight, idx) => (
           <div 
             key={idx} 
-            className="flex gap-6 items-start p-8 rounded-[1.5rem] bg-[#161b22]/40 border-l-4 border-purple-500 animate-in slide-in-from-right-8 duration-700"
+            className="flex gap-5 items-start p-6 rounded-[1.5rem] bg-[#161b22]/40 border-l-4 border-purple-500 animate-in slide-in-from-right-8 duration-700"
             style={{ animationDelay: `${idx * 500}ms` }}
           >
-            <span className="text-purple-500 font-mono text-xs pt-1 uppercase tracking-widest">Insight {idx + 1}</span>
-            <p className="text-xl text-[#c9d1d9] leading-relaxed font-light">
+            <span className="text-purple-500 font-mono text-[10px] pt-1.5 uppercase tracking-widest whitespace-nowrap">Trace {idx + 1}</span>
+            <p className="text-base text-[#c9d1d9] leading-relaxed font-light">
               {insight}
             </p>
           </div>

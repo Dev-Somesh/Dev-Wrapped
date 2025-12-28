@@ -37,7 +37,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
       </h1>
       
       <p className="text-[#8b949e] text-lg md:text-xl max-w-lg mx-auto mb-10 leading-relaxed font-light italic">
-        "One log at a time, we built the future."
+        "Relive the milestones, the streaks, and the logic that defined your journey."
       </p>
 
       <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
