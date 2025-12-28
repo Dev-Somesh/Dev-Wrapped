@@ -1,32 +1,32 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GitHubStats, AIInsights } from "../types";
 
 export const generateAIWrapped = async (stats: GitHubStats): Promise<AIInsights> => {
-  // Always create instance inside the call to ensure latest API_KEY from environment is used
+  // Always create a new instance inside the call to ensure we use the latest key
+  // provided via environment or window.aistudio dialog.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
-    Analyze this developer's GitHub activity for their "Year Wrapped" story.
+    Analyze this developer's 2024-2025 GitHub activity. Create a compelling "Year Wrapped" narrative.
     
-    USER DATA:
+    TELEMETRY DATA:
     - Username: ${stats.username}
     - Total Commits: ${stats.totalCommits}
     - Active Days: ${stats.activeDays}
-    - Top Languages: ${stats.topLanguages.map(l => l.name).join(', ')}
-    - Repo Count: ${stats.reposContributed}
-    - Streak: ${stats.streak} days
-    - Peak Month: ${stats.mostActiveMonth}
+    - Primary Languages: ${stats.topLanguages.map(l => l.name).join(', ')}
+    - Repo Impact: ${stats.reposContributed}
+    - Max Streak: ${stats.streak} days
+    - Peak Activity: ${stats.mostActiveMonth}
     
-    REQUIREMENTS:
-    1. Select a compelling Archetype (e.g., The Architect, The Polisher, The Sprinter).
-    2. Provide a 1-sentence poetic description of that archetype.
-    3. Generate a cinematic 3-paragraph narrative about their year.
-    4. Provide 3 specific observations ("insights").
-    5. Provide 2 behavioral patterns.
-    6. Provide 1 punchy card insight (max 12 words).
+    STORYTELLING REQUIREMENTS:
+    1. Select a unique Archetype that feels cinematic (e.g., The Midnight Architect, The Silent Optimizer, The Polyglot Voyager).
+    2. Write a 1-sentence poetic "classification" for the archetype.
+    3. Generate a cinematic 3-paragraph story of their year. Focus on the 'vibe' of their work.
+    4. Provide 3 specific behavioral "observations" (e.g., "Thrives when focusing on deep logic in C++").
+    5. Provide 2 coding patterns noticed.
+    6. Provide 1 short "card insight" (max 10 words) for their social media share card.
     
-    TONE: Sophisticated, cinematic, tech-noir.
+    TONE: Sophisticated, reflective, high-end editorial.
   `;
 
   try {
@@ -50,9 +50,10 @@ export const generateAIWrapped = async (stats: GitHubStats): Promise<AIInsights>
       }
     });
 
+    if (!response.text) throw new Error("AI returned empty response");
     return JSON.parse(response.text);
-  } catch (error) {
-    console.error("AI Generation Error:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("AI Generation Failed:", error);
+    throw new Error(error.message || "Failed to generate AI insights. Check your API key.");
   }
 };
