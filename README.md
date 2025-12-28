@@ -1,3 +1,4 @@
+
 <p align="center">
   <img src="https://capsule-render.vercel.app/render?type=glitch&color=0d1117&height=300&section=header&text=DEV_WRAPPED&fontSize=80&animation=fadeIn&fontColor=39d353" />
 </p>
@@ -12,14 +13,14 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/INTELLIGENCE-GEMINI_3_FLASH-8E75FF?style=for-the-badge&logo=google-gemini&logoColor=white" />
+  <img src="https://img.shields.io/badge/ECONOMY-FLASH_LITE-58a6ff?style=for-the-badge&logo=google-gemini&logoColor=white" />
   <img src="https://img.shields.io/badge/TELEMETRY-GITHUB_V3-39D353?style=for-the-badge&logo=github&logoColor=white" />
-  <img src="https://img.shields.io/badge/AESTHETIC-CINEMATIC_DARK-58a6ff?style=for-the-badge" />
 </p>
 
 ---
 
 ## ◈ THE VISION
-**DevWrapped 2025** is an elite Year-in-Review engine that transforms raw GitHub telemetry into a cinematic narrative. By combining **Google Gemini 3 Flash** with your real-world commit history, we reveal the hidden developer archetype behind your contributions.
+**DevWrapped 2025** is an elite Year-in-Review engine that transforms raw GitHub telemetry into a cinematic narrative. By combining **Google Gemini (Flash or Lite)** with your real-world commit history, we reveal the hidden developer archetype behind your contributions.
 
 ---
 
@@ -29,8 +30,8 @@ The system operates on two distinct authorization layers:
 
 ### 1. The Session Key (BYOK)
 For maximum privacy and scalability, users can authorize a volatile session using their own Google Cloud Project. 
-- **Flow**: Click "Select API Key" -> Authenticate with Google -> Choose Project.
-- **Requirement**: A Google Cloud project with the Gemini API enabled (Paid billing required).
+- **Free Tier Supported**: You can use a standard free Gemini API key by choosing the "Flash Lite" model or using the standard "Flash 3" model within its free-tier limits.
+- **Requirement**: A Google Cloud project with the Gemini API enabled.
 - **Security**: Keys are never stored; they exist only in memory during the analysis trace.
 
 ### 2. The Global Key (Developer Deployment)
@@ -44,7 +45,8 @@ If you are hosting this for a specific team or audience and wish to provide the 
 
 ```yaml
 intelligence_core:
-  model: gemini-3-flash-preview
+  primary: gemini-3-flash-preview (Balanced Performance)
+  economy: gemini-flash-lite-latest (Free Tier Optimized)
   role: Narrative Reasoning & Pattern Extraction
   parameters: JSON_SCHEMA_STRICT
 

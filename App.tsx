@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Step, GitHubStats, AIInsights } from './types';
 import { fetchGitHubData } from './services/githubService';
@@ -51,8 +52,9 @@ const BackgroundIcons: React.FC = () => {
   );
 };
 
-const ApiKeyGuard: React.FC<{ onAuthorized: () => void }> = ({ onAuthorized }) => {
+const ApiKeyGuard: React.FC<{ onAuthorized: (model: string) => void }> = ({ onAuthorized }) => {
   const [loading, setLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gemini-3-flash-preview");
 
   const handleSelectKey = async () => {
     setLoading(true);
@@ -61,15 +63,13 @@ const ApiKeyGuard: React.FC<{ onAuthorized: () => void }> = ({ onAuthorized }) =
       try {
         // @ts-ignore
         await window.aistudio.openSelectKey();
-        // RULE: Assume selection was successful and proceed to avoid race conditions
-        onAuthorized();
+        onAuthorized(selectedModel);
       } catch (err) {
         console.error("Key selection UI failed to open", err);
         setLoading(false);
       }
     } else {
-      // If window.aistudio is not found, we assume the environment key is provided
-      onAuthorized();
+      onAuthorized(selectedModel);
     }
   };
 
@@ -86,18 +86,27 @@ const ApiKeyGuard: React.FC<{ onAuthorized: () => void }> = ({ onAuthorized }) =
           <div className="space-y-4">
             <h2 className="text-4xl font-display font-black text-white tracking-tighter leading-tight">Authorize AI Session.</h2>
             <p className="text-[#8b949e] text-base font-light leading-relaxed">
-              DevWrapped uses <strong>Gemini 3 Flash</strong> for narrative intelligence. Please authorize using a key from a paid Google Cloud project.
+              DevWrapped requires a Gemini API Key. Both <strong>Free Tier</strong> and <strong>Paid</strong> keys are supported.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#0d1117] border border-white/5 p-5 rounded-2xl">
-              <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-3">System_Core</p>
-              <p className="text-[11px] font-mono text-[#f0f6fc]">Gemini 3 Flash</p>
-            </div>
-            <div className="bg-[#0d1117] border border-white/5 p-5 rounded-2xl">
-              <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-3">Requirement</p>
-              <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener noreferrer" className="text-[11px] font-mono text-[#58a6ff] hover:underline">Paid Billing ↗</a>
+          <div className="space-y-4">
+            <p className="text-[10px] font-mono text-[#484f58] uppercase tracking-[0.3em] font-black">Select Processing Core</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => setSelectedModel("gemini-3-flash-preview")}
+                className={`p-4 rounded-2xl border transition-all text-left ${selectedModel === "gemini-3-flash-preview" ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]' : 'bg-[#0d1117] border-white/5 text-[#8b949e]'}`}
+              >
+                <p className="text-[11px] font-black uppercase mb-1">Flash 3</p>
+                <p className="text-[9px] opacity-60">High Performance</p>
+              </button>
+              <button 
+                onClick={() => setSelectedModel("gemini-flash-lite-latest")}
+                className={`p-4 rounded-2xl border transition-all text-left ${selectedModel === "gemini-flash-lite-latest" ? 'bg-[#58a6ff]/10 border-[#58a6ff] text-[#58a6ff]' : 'bg-[#0d1117] border-white/5 text-[#8b949e]'}`}
+              >
+                <p className="text-[11px] font-black uppercase mb-1">Flash Lite</p>
+                <p className="text-[9px] opacity-60">Free Tier Friendly</p>
+              </button>
             </div>
           </div>
 
@@ -110,9 +119,10 @@ const ApiKeyGuard: React.FC<{ onAuthorized: () => void }> = ({ onAuthorized }) =
             <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5Z"></path></svg>
           </button>
 
-          <p className="text-center text-[10px] font-mono text-[#484f58] uppercase tracking-widest">
-            Session keys are volatile & never stored.
-          </p>
+          <div className="flex justify-between items-center text-[9px] font-mono text-[#484f58] uppercase tracking-widest px-2">
+            <span>Session: Volatile</span>
+            <a href="https://ai.google.dev/pricing" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Pricing ↗</a>
+          </div>
         </div>
       </div>
     </div>
@@ -126,6 +136,7 @@ const App: React.FC = () => {
   const [insights, setInsights] = useState<AIInsights | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [activeModel, setActiveModel] = useState("gemini-3-flash-preview");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -139,15 +150,12 @@ const App: React.FC = () => {
     checkAuth();
   }, []);
 
-  const startAnalysis = async (user: string, token?: string) => {
-    // Re-check auth if needed
-    // @ts-ignore
-    if (!isAuthorized && window.aistudio) {
-      // @ts-ignore
-      await window.aistudio.openSelectKey();
-      setIsAuthorized(true);
-    }
+  const handleAuthorization = (model: string) => {
+    setActiveModel(model);
+    setIsAuthorized(true);
+  };
 
+  const startAnalysis = async (user: string, token?: string) => {
     setUsername(user);
     setStep(Step.Analysis);
     setError(null);
@@ -156,13 +164,12 @@ const App: React.FC = () => {
       const fetchedStats = await fetchGitHubData(user, token);
       setStats(fetchedStats);
       
-      const fetchedInsights = await generateAIWrapped(fetchedStats);
+      const fetchedInsights = await generateAIWrapped(fetchedStats, activeModel);
       setInsights(fetchedInsights);
       
       setTimeout(() => setStep(Step.Stats), 3500);
     } catch (err: any) {
       console.error(err);
-      // Detailed error handling for missing/invalid keys or system failures
       if (err.message && (err.message.includes("API_KEY") || err.message.includes("404") || err.message.includes("key") || err.message.includes("not found"))) {
         setIsAuthorized(false);
         setError("AI Session Authorization Failed. Please select a valid key. Contact hello@someshbhardwaj.me if the issue persists.");
@@ -206,7 +213,7 @@ const App: React.FC = () => {
       <BackgroundIcons />
       
       {!isAuthorized && step === Step.Entry && (
-        <ApiKeyGuard onAuthorized={() => setIsAuthorized(true)} />
+        <ApiKeyGuard onAuthorized={handleAuthorization} />
       )}
 
       <main className="flex-1 w-full max-w-5xl px-6 mx-auto z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] relative">
@@ -220,7 +227,7 @@ const App: React.FC = () => {
           <span className="text-white/40">Engineered by Somesh Bhardwaj</span>
         </div>
         <div className="flex items-center gap-6 mt-4 md:mt-0">
-          <span className="text-[#58a6ff] font-black uppercase tracking-widest opacity-60">Model: Gemini 3 Flash</span>
+          <span className="text-[#58a6ff] font-black uppercase tracking-widest opacity-60">Engine: {activeModel.includes('lite') ? 'Gemini Lite' : 'Gemini 3 Flash'}</span>
         </div>
       </footer>
     </div>

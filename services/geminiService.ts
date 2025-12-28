@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GitHubStats, AIInsights } from "../types";
 
-export const generateAIWrapped = async (stats: GitHubStats): Promise<AIInsights> => {
+export const generateAIWrapped = async (stats: GitHubStats, modelName: string = "gemini-3-flash-preview"): Promise<AIInsights> => {
   // Always create a new instance inside the call to ensure the latest API key is used
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
@@ -31,7 +31,7 @@ export const generateAIWrapped = async (stats: GitHubStats): Promise<AIInsights>
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: modelName,
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -54,7 +54,6 @@ export const generateAIWrapped = async (stats: GitHubStats): Promise<AIInsights>
     return JSON.parse(response.text);
   } catch (error: any) {
     console.error("Gemini Core Error:", error);
-    // Bubble up a clear message for the UI to handle key reset
-    throw new Error(error.message || "Session invalid. Please verify your API key.");
+    throw new Error(error.message || "Session invalid. Please verify your API key and selected model.");
   }
 };
