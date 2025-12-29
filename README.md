@@ -25,6 +25,15 @@
 
 ---
 
+## 🎬 Preview
+
+<div align="center">
+  <img src="./assets/devwrapped-hero.png" alt="DevWrapped 2025 - Celebrate Your Code Journey" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+  <p><em>Transform your GitHub activity into a cinematic year-in-review experience</em></p>
+</div>
+
+---
+
 ## ◈ THE VISION
 **DevWrapped 2025** is an elite Year-in-Review engine that transforms raw GitHub telemetry into a cinematic narrative. By combining **Google Gemini AI** with your real-world commit history, we reveal the hidden developer archetype behind your contributions.
 
@@ -82,6 +91,23 @@ For comprehensive documentation including architecture, deployment, API referenc
 - **Beautiful Visualizations**: Interactive cards and detailed dossiers
 - **Export Capabilities**: High-quality image sharing
 - **Streamlined UX**: Direct flow from input to results
+
+## 📸 Screenshots
+
+<div align="center">
+  
+### 🎯 Landing Page
+*Clean, professional interface for GitHub username input*
+
+### 📊 Share Card
+*Comprehensive summary with key statistics and export functionality*
+
+### 📋 Development Dossier  
+*Detailed analysis with repository cards, tech stack visualization, and activity patterns*
+
+</div>
+
+> **Note**: To add the hero screenshot, save your image as `devwrapped-hero.png` in the `assets/` directory.
 
 ---
 
