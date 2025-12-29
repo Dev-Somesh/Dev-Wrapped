@@ -1,20 +1,11 @@
 
 <div align="center">
 
-<svg width="400" height="80" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#39d353;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#58a6ff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#bc8cff;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <text x="50%" y="50" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#gradient)">DEV_WRAPPED</text>
-</svg>
+<h1 style="font-size: 3rem; font-weight: 900; letter-spacing: -0.05em;">
+  <span style="color: #39d353;">DEV</span><span style="color: #58a6ff;">_</span><span style="color: #bc8cff;">WRAPPED</span>
+</h1>
 
-<p>
-  <sub style="color: #8b949e; font-size: 0.8em;">2025</sub>
-</p>
+<sub style="color: #8b949e;">2025</sub>
 
 </div>
 
