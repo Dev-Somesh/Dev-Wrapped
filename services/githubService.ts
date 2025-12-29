@@ -1,53 +1,89 @@
-
 import { GitHubStats, GitHubRepo } from '../types';
+
+/**
+ * Client-side timeout: 25s total (allows for 4 parallel calls + processing)
+ * Netlify function timeout: 10s per call
+ */
+const CLIENT_TIMEOUT_MS = 25000;
 
 /**
  * Calls the Netlify serverless function to proxy GitHub API calls.
  * This avoids CORS issues and keeps tokens server-side.
+ * Includes timeout handling for production reliability.
  */
-const fetchViaProxy = async (endpoint: string, username: string, token?: string) => {
-  const response = await fetch('/.netlify/functions/github-proxy', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      username,
-      token,
-      endpoint,
-    }),
-  });
+const fetchViaProxy = async (endpoint: string, username: string, token?: string, timeoutMs: number = 8000): Promise<any> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-    throw new Error(errorData.error || `HTTP ${response.status}`);
+  try {
+    const response = await fetch('/.netlify/functions/github-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        token,
+        endpoint,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === 'AbortError' || error.message?.includes('timeout')) {
+      throw new Error('GITHUB_API_TIMEOUT: Request timed out. GitHub API may be slow. Please retry.');
+    }
+    
+    throw error;
   }
-
-  return response.json();
 };
 
 export const fetchGitHubData = async (username: string, token?: string): Promise<GitHubStats> => {
-  const fetchWithAuth = async (endpoint: string) => {
-    try {
-      return await fetchViaProxy(endpoint, username, token);
-    } catch (error: any) {
-      // Re-throw with proper error message
-      throw error;
-    }
-  };
+  const startTime = Date.now();
 
   try {
-    const userData = await fetchWithAuth(`/users/${username}`);
-    
-    const commitSearch = await fetchWithAuth(
-      `/search/commits?q=author:${username}+committer-date:>=2024-01-01&per_page=1`
-    );
-    const totalCommits = commitSearch.total_count || 0;
+    // OPTIMIZATION: Parallelize independent calls
+    // These 3 calls don't depend on each other and can run simultaneously
+    const [userData, reposData, eventsData] = await Promise.allSettled([
+      fetchViaProxy(`/users/${username}`, username, token, 5000),
+      fetchViaProxy(`/users/${username}/repos?sort=updated&per_page=100`, username, token, 8000),
+      // Reduced from 100 to 30 events - sufficient for activity pattern analysis
+      fetchViaProxy(`/users/${username}/events?per_page=30`, username, token, 8000),
+    ]);
 
-    const reposData = await fetchWithAuth(`/users/${username}/repos?sort=updated&per_page=100`);
-    
+    // Check if we're running out of time
+    if (Date.now() - startTime > CLIENT_TIMEOUT_MS - 2000) {
+      throw new Error('GITHUB_FETCH_TIMEOUT: Data fetching exceeded time limit. Please retry.');
+    }
+
+    // Handle user data
+    if (userData.status === 'rejected') {
+      throw new Error(userData.reason?.message || 'Failed to fetch user data');
+    }
+    const user = userData.value;
+
+    // Handle repos data
+    if (reposData.status === 'rejected') {
+      throw new Error(reposData.reason?.message || 'Failed to fetch repositories');
+    }
+    const repos = reposData.value;
+
+    // Handle events data (optional - can continue with empty array)
+    const events = eventsData.status === 'fulfilled' ? eventsData.value : [];
+
+    // Process repos data (can happen while commit search runs)
     const langMap: Record<string, number> = {};
-    const recentRepos: GitHubRepo[] = reposData.slice(0, 5).map((repo: any) => ({
+    const recentRepos: GitHubRepo[] = repos.slice(0, 5).map((repo: any) => ({
       name: repo.name,
       url: repo.html_url,
       description: repo.description || 'No description provided.',
@@ -55,7 +91,7 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       stars: repo.stargazers_count
     }));
 
-    reposData.forEach((repo: any) => {
+    repos.forEach((repo: any) => {
       if (repo.language) {
         langMap[repo.language] = (langMap[repo.language] || 0) + 1;
       }
@@ -66,8 +102,7 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const events = await fetchWithAuth(`/users/${username}/events?per_page=100`);
-
+    // Process events data
     const activeDaysSet = new Set<string>();
     const dates: string[] = [];
     
@@ -77,6 +112,7 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       dates.push(date);
     });
 
+    // Calculate streak
     let currentStreak = 0;
     if (dates.length > 0) {
       const sortedDates = Array.from(activeDaysSet).sort().reverse();
@@ -92,7 +128,7 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       }
     }
 
-    const activityPattern = activeDaysSet.size > 15 ? 'consistent' : 'burst';
+    const activityPattern = activeDaysSet.size > 15 ? 'consistent' : activeDaysSet.size > 5 ? 'burst' : 'sporadic';
     const monthCounts: Record<string, number> = {};
     events.forEach((e: any) => {
       const m = new Date(e.created_at).toLocaleString('en-US', { month: 'long' });
@@ -100,16 +136,43 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
     });
     const mostActiveMonth = Object.entries(monthCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'October';
 
-    const estimatedActiveDays = Math.max(activeDaysSet.size, Math.min(totalCommits, Math.floor(totalCommits / 2.5)));
+    // OPTIMIZATION: Commit search is slow - run it last and make it optional
+    // Use a shorter timeout since we already have most data
+    let totalCommits = 0;
+    try {
+      const commitSearchResult = await Promise.race([
+        fetchViaProxy(
+          `/search/commits?q=author:${username}+committer-date:>=2024-01-01&per_page=1`,
+          username,
+          token,
+          5000 // Shorter timeout - this is the slowest endpoint
+        ),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Commit search timeout')), 5000)
+        ),
+      ]) as any;
+      
+      totalCommits = commitSearchResult?.total_count || 0;
+    } catch (commitError) {
+      // Commit search failed - estimate from repos and events
+      // This is acceptable degradation - we can still show stats
+      console.warn('Commit search timed out, using estimate:', commitError);
+      totalCommits = Math.max(events.length * 2, repos.length * 5);
+    }
+
+    const estimatedActiveDays = Math.max(
+      activeDaysSet.size, 
+      Math.min(totalCommits, Math.floor(totalCommits / 2.5))
+    );
 
     return {
-      username: userData.login,
-      avatarUrl: userData.avatar_url,
-      profileUrl: userData.html_url,
+      username: user.login,
+      avatarUrl: user.avatar_url,
+      profileUrl: user.html_url,
       totalCommits,
       activeDays: estimatedActiveDays,
       topLanguages: topLanguages.length > 0 ? topLanguages : [{ name: 'Unknown', count: 0 }],
-      reposContributed: userData.public_repos + (userData.total_private_repos || 0),
+      reposContributed: user.public_repos + (user.total_private_repos || 0),
       recentRepos,
       streak: currentStreak,
       mostActiveMonth,

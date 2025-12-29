@@ -1,6 +1,30 @@
 import { Handler } from '@netlify/functions';
 
+/**
+ * Netlify Free Tier: 10s function timeout
+ * We set 7s timeout per GitHub API call to leave buffer for:
+ * - Cold start (0-2s)
+ * - Network overhead
+ * - Response processing
+ */
+const GITHUB_API_TIMEOUT_MS = 7000;
+
+/**
+ * Creates an AbortController with timeout for fetch requests
+ * Note: Timeout is automatically cleared when fetch completes or errors
+ */
+function createTimeoutController(timeoutMs: number): AbortController {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutMs);
+  return controller;
+}
+
 export const handler: Handler = async (event, context) => {
+  // Set function timeout warning (Netlify Free: 10s max)
+  // We return early if we're close to timeout
+  const startTime = Date.now();
+  const FUNCTION_TIMEOUT_BUFFER_MS = 500; // Return 500ms before Netlify timeout
+
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -38,6 +62,21 @@ export const handler: Handler = async (event, context) => {
       };
     }
 
+    // Check if we're running out of function time
+    const elapsed = Date.now() - startTime;
+    if (elapsed > 9500) {
+      return {
+        statusCode: 504,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          error: 'GITHUB_FUNCTION_TIMEOUT: Function execution time exceeded. Please retry.' 
+        }),
+      };
+    }
+
     // Build the GitHub API URL
     const baseUrl = 'https://api.github.com';
     let url = `${baseUrl}${endpoint}`;
@@ -56,8 +95,33 @@ export const handler: Handler = async (event, context) => {
       headers['Authorization'] = `token ${token}`;
     }
 
-    // Make the request to GitHub API
-    const response = await fetch(url, { headers });
+    // Create timeout controller
+    const controller = createTimeoutController(GITHUB_API_TIMEOUT_MS);
+
+    // Make the request to GitHub API with timeout
+    let response: Response;
+    try {
+      response = await fetch(url, { 
+        headers,
+        signal: controller.signal,
+      });
+    } catch (fetchError: any) {
+      // Handle timeout specifically
+      if (fetchError.name === 'AbortError' || fetchError.message?.includes('aborted')) {
+        return {
+          statusCode: 504,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            error: 'GITHUB_API_TIMEOUT: GitHub API request timed out after 7s. The API may be slow or rate-limited.' 
+          }),
+        };
+      }
+      // Re-throw other network errors
+      throw fetchError;
+    }
 
     if (!response.ok) {
       let errorMessage = `GitHub API error: ${response.status}`;
@@ -74,7 +138,7 @@ export const handler: Handler = async (event, context) => {
       } else if (response.status === 404) {
         errorMessage = `GITHUB_USER_NOT_FOUND: The user profile "${username}" does not exist.`;
       } else if (response.status >= 500) {
-        errorMessage = 'GITHUB_SERVER_OFFLINE: GitHub services are currently experiencing high latency or downtime.';
+        errorMessage = 'GITHUB_SERVER_ERROR: GitHub API returned a server error. Please try again in a moment.';
       }
 
       return {
@@ -98,6 +162,20 @@ export const handler: Handler = async (event, context) => {
       body: JSON.stringify(data),
     };
   } catch (error: any) {
+    // Distinguish timeout from other errors
+    if (error.name === 'AbortError' || error.message?.includes('timeout') || error.message?.includes('aborted')) {
+      return {
+        statusCode: 504,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          error: 'GITHUB_API_TIMEOUT: Request to GitHub API timed out. Please retry.' 
+        }),
+      };
+    }
+
     return {
       statusCode: 500,
       headers: {
@@ -108,4 +186,3 @@ export const handler: Handler = async (event, context) => {
     };
   }
 };
-

@@ -5,6 +5,10 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # Netlify Free Tier: 10s timeout (cannot be changed)
+  # Our functions are optimized to complete within 7s per API call
+  # github-proxy: Handles single GitHub API calls with 7s timeout
+  # gemini-proxy: Handles Gemini API calls (typically 2-5s)
 
 [[redirects]]
   from = "/.netlify/functions/*"
