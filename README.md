@@ -1,7 +1,22 @@
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/render?type=glitch&color=0d1117&height=300&section=header&text=DEV_WRAPPED&fontSize=80&animation=fadeIn&fontColor=39d353" />
+<div align="center">
+
+<svg width="400" height="80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#39d353;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#58a6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bc8cff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <text x="50%" y="50" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#gradient)">DEV_WRAPPED</text>
+</svg>
+
+<p>
+  <sub style="color: #8b949e; font-size: 0.8em;">2025</sub>
 </p>
+
+</div>
 
 <p align="center">
   <kbd><b>[ SYSTEM_STATUS: OPERATIONAL ]</b></kbd>
