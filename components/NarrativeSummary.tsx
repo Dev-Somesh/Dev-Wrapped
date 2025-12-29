@@ -9,6 +9,12 @@ interface NarrativeSummaryProps {
 }
 
 const NarrativeSummary: React.FC<NarrativeSummaryProps> = ({ insights, onNext, onBack }) => {
+
+  // Temporarily disable highlighting to prevent CSS leakage
+  const highlightText = (text: string) => {
+    return text; // Return text as-is without highlighting
+  };
+
   return (
     <div className="text-center max-w-3xl mx-auto animate-in fade-in zoom-in-95 duration-2000 py-12">
       <div className="w-px h-24 bg-gradient-to-b from-transparent via-purple-500 to-transparent mx-auto mb-12"></div>
@@ -16,9 +22,12 @@ const NarrativeSummary: React.FC<NarrativeSummaryProps> = ({ insights, onNext, o
       <p className="text-2xl md:text-3xl lg:text-4xl font-display leading-[1.7] text-[#c9d1d9] font-light italic">
         {insights.narrative.split('.').map((sentence, i) => (
           sentence && (
-            <span key={i} className="block mb-8 animate-in fade-in duration-1000" style={{ animationDelay: `${i * 1.5}s` }}>
-              {sentence.trim()}.
-            </span>
+            <span 
+              key={i} 
+              className="block mb-8 animate-in fade-in duration-1000" 
+              style={{ animationDelay: `${i * 1.5}s` }}
+              dangerouslySetInnerHTML={{ __html: highlightText(sentence.trim()) + '.' }}
+            />
           )
         ))}
       </p>

@@ -44,6 +44,41 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   const [activeHook, setActiveHook] = useState(0);
   const [traceId, setTraceId] = useState('FETCHING...');
 
+  // Temporary fallback: extract number from AI insight if API data is missing
+  const extractRepoCountFromInsight = () => {
+    if (stats.reposCreatedThisYear !== undefined && stats.reposCreatedThisYear !== null) {
+      return stats.reposCreatedThisYear;
+    }
+    
+    // Try to extract from cardInsight text
+    const insight = insights.cardInsight || '';
+    const numberMatch = insight.match(/(\w+)-(\w+)/); // "twenty-eight"
+    if (numberMatch) {
+      const wordNumbers: Record<string, number> = {
+        'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+        'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+        'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20,
+        'thirty': 30, 'forty': 40, 'fifty': 50
+      };
+      
+      const parts = numberMatch[0].split('-');
+      if (parts.length === 2) {
+        const tens = wordNumbers[parts[0]] || 0;
+        const ones = wordNumbers[parts[1]] || 0;
+        return tens + ones;
+      }
+    }
+    
+    // Try simple number extraction
+    const simpleNumber = insight.match(/\b(\d+)\b/);
+    if (simpleNumber) {
+      return parseInt(simpleNumber[1]);
+    }
+    
+    return 0;
+  };
+
   useEffect(() => {
     generateSecureTraceId(stats.username).then(setTraceId);
   }, [stats.username]);
@@ -110,12 +145,12 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   const copyToClipboard = (text: string, platform?: string) => {
     const fullText = `${text}\n\n${hashtags}`;
     navigator.clipboard.writeText(fullText);
-    alert(`${platform ? platform : 'Text'} copied to clipboard! Share it with your exported image.`);
+    alert(`${platform ? platform : 'Text'} copied to clipboard!`);
   };
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.origin);
-    alert('App link copied! Share it so others can see their year.');
+    alert('App link copied!');
   };
 
   const candidateStats: SelectedStat[] = [
@@ -147,13 +182,21 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       score: 2,
       icon: <Octicon className="w-3 h-3 text-[#58a6ff]">{Icons.GitCommit}</Octicon>
     },
+    { 
+      id: 'reposCreated', 
+      label: 'New Repos', 
+      value: stats.reposCreatedThisYear || 0, 
+      score: 2,
+      icon: <Octicon className="w-3 h-3 text-[#f85149]">{Icons.Repo}</Octicon>
+    },
   ];
 
   const gridCells = Array.from({ length: 12 }).map(() => {
     const val = Math.random();
-    if (val > 0.8) return '#39d353';
-    if (val > 0.5) return '#26a641';
-    return '#161b22';
+    if (val > 0.7) return '#39d353'; // More green squares (30% chance)
+    if (val > 0.4) return '#26a641'; // Medium green (30% chance)
+    if (val > 0.2) return '#0d4429'; // Dark green (20% chance)
+    return '#161b22'; // Dark background (20% chance)
   });
 
   const ratioStyles = {
@@ -171,12 +214,12 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
         </div>
       </div>
       
-      <div className="flex flex-col xl:flex-row gap-12 items-start justify-center w-full max-w-7xl px-4">
+      <div className="flex flex-col xl:flex-row gap-8 items-start justify-center w-full max-w-7xl px-4">
         
         {/* CARD VIEWER */}
         <div 
           ref={containerRef}
-          className="flex flex-col items-center gap-6 w-full xl:w-auto"
+          className="flex flex-col items-center gap-6 w-full xl:w-auto flex-shrink-0"
         >
           {/* Ratio Selector */}
           <div className="flex bg-[#161b22]/90 backdrop-blur-2xl p-1.5 rounded-full border border-[#30363d] shadow-2xl z-20">
@@ -202,73 +245,121 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
           >
             <div 
               ref={cardRef}
-              className={`absolute inset-0 bg-[#0d1117] rounded-[2rem] p-8 md:p-10 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col`}
+              className={`absolute inset-0 bg-[#0d1117] rounded-[2rem] p-6 md:p-8 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col`}
               style={{ ...ratioStyles[aspectRatio] }}
             >
-              <div className="absolute top-0 right-0 p-8 opacity-5 font-mono text-[8px] tracking-[0.4em] uppercase rotate-90 origin-top-right whitespace-nowrap select-none">
+              {/* Background GitHub Logos */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                {/* First GitHub logo - top right */}
+                <div 
+                  className="absolute opacity-[0.04] select-none"
+                  style={{
+                    top: '10%',
+                    right: '5%',
+                    transform: 'rotate(15deg)',
+                  }}
+                >
+                  <svg width="120" height="120" viewBox="0 0 16 16" fill="#c9d1d9">
+                    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                  </svg>
+                </div>
+                
+                {/* Second GitHub logo - bottom left */}
+                <div 
+                  className="absolute opacity-[0.03] select-none"
+                  style={{
+                    bottom: '15%',
+                    left: '8%',
+                    transform: 'rotate(-12deg)',
+                  }}
+                >
+                  <svg width="100" height="100" viewBox="0 0 16 16" fill="#c9d1d9">
+                    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                  </svg>
+                </div>
+              </div>
+
+              <div className="absolute top-0 right-0 p-8 opacity-5 font-mono text-[8px] tracking-[0.4em] uppercase rotate-90 origin-top-right whitespace-nowrap select-none z-5">
                 ARTIFACT_VERIFIED_{traceId}
               </div>
 
               {/* Header */}
-              <div className="flex justify-between items-start mb-6 relative z-10 flex-shrink-0">
+              <div className="flex justify-between items-start mb-4 relative z-20 flex-shrink-0">
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-mono text-[#8b949e] tracking-[0.3em] uppercase mb-1">DEV_WRAPPED</span>
-                  <span className="text-xl font-display font-black text-white tracking-tighter">2025</span>
+                  <span className="text-[8px] font-mono text-[#8b949e] tracking-[0.3em] uppercase mb-1">DEV_WRAPPED</span>
+                  <span className="text-lg font-display font-black text-white tracking-tighter">2025</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
-                  <img src={stats.avatarUrl} alt={stats.username} className="w-6 h-6 rounded-full grayscale" />
+                <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                  <img src={stats.avatarUrl} alt={stats.username} className="w-5 h-5 rounded-full grayscale" />
                   <div className="flex flex-col">
-                    <span className="text-[11px] font-black text-white/90 leading-none">@{stats.username}</span>
+                    <span className="text-[10px] font-black text-white/90 leading-none">@{stats.username}</span>
                     <div className="flex items-center gap-1 opacity-40">
-                      <Octicon className="w-2 h-2">{Icons.Repo}</Octicon>
-                      <span className="text-[7px] font-mono uppercase tracking-widest">{stats.reposContributed} repos</span>
+                      <Octicon className="w-1.5 h-1.5">{Icons.Repo}</Octicon>
+                      <span className="text-[6px] font-mono uppercase tracking-widest">{stats.reposContributed} repos</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Archetype Hero */}
-              <div className={`flex flex-col relative z-10 flex-shrink-0 ${aspectRatio === '1:1' ? 'mb-4' : 'mb-6'}`}>
-                 <div className="w-10 h-[3px] bg-[#39d353] mb-5 rounded-full shadow-[0_0_15px_rgba(57,211,83,0.4)]"></div>
-                 <h3 className={`${aspectRatio === '1:1' ? 'text-2xl' : 'text-3xl md:text-4xl'} font-display font-black text-white leading-tight tracking-tighter mb-4 uppercase`}>
+              <div className={`flex flex-col relative z-20 flex-shrink-0 ${aspectRatio === '1:1' ? 'mb-3' : 'mb-4'}`}>
+                 <div className="w-8 h-[2px] bg-[#39d353] mb-3 rounded-full shadow-[0_0_15px_rgba(57,211,83,0.4)]"></div>
+                 <h3 className={`${aspectRatio === '1:1' ? 'text-xl' : 'text-2xl md:text-3xl'} font-display font-black text-white leading-tight tracking-tighter mb-3 uppercase`}>
                    {insights.archetype}
                  </h3>
-                 <p className={`${aspectRatio === '1:1' ? 'text-[11px]' : 'text-[13px] md:text-[15px]'} text-[#8b949e] font-light leading-relaxed tracking-wide opacity-90 italic`}>
+                 <p className={`${aspectRatio === '1:1' ? 'text-[10px]' : 'text-[11px] md:text-[12px]'} text-[#8b949e] font-light leading-relaxed tracking-wide opacity-90 italic`}>
                    {insights.archetypeDescription}
                  </p>
               </div>
 
               {/* Stats Grid */}
-              <div className={`grid grid-cols-2 gap-x-8 gap-y-4 relative z-10 ${aspectRatio === '1:1' ? 'mb-4' : 'mb-6'}`}>
-                {candidateStats.map((stat) => (
-                  <div key={stat.id} className="border-t border-white/10 pt-2 md:pt-4 group">
-                    <div className="flex items-center gap-1.5 mb-1">
+              <div className={`grid grid-cols-2 gap-x-4 gap-y-2 relative z-20 ${aspectRatio === '1:1' ? 'mb-3' : 'mb-4'}`}>
+                {candidateStats.slice(0, 4).map((stat) => (
+                  <div key={stat.id} className="border-t border-white/10 pt-1.5 md:pt-2 group">
+                    <div className="flex items-center gap-1 mb-0.5">
                       <span className="opacity-40 group-hover:opacity-100 transition-opacity">
                         {stat.icon}
                       </span>
-                      <p className="text-[8px] md:text-[9px] text-[#484f58] font-mono uppercase tracking-[0.2em] group-hover:text-[#8b949e] transition-colors">{stat.label}</p>
+                      <p className="text-[7px] md:text-[8px] text-[#484f58] font-mono uppercase tracking-[0.2em] group-hover:text-[#8b949e] transition-colors">{stat.label}</p>
                     </div>
-                    <p className={`${aspectRatio === '1:1' ? 'text-xl' : 'text-2xl md:text-3xl'} text-white font-black tracking-tighter truncate`}>{stat.value}</p>
+                    <p className={`${aspectRatio === '1:1' ? 'text-lg' : 'text-xl md:text-2xl'} text-white font-black tracking-tighter truncate`}>{stat.value}</p>
                   </div>
                 ))}
               </div>
 
+              {/* Additional Stats Row */}
+              {candidateStats.length > 4 && (
+                <div className={`grid grid-cols-1 gap-y-2 relative z-20 ${aspectRatio === '1:1' ? 'mb-3' : 'mb-4'}`}>
+                  {candidateStats.slice(4).map((stat) => (
+                    <div key={stat.id} className="border-t border-white/10 pt-1.5 md:pt-2 group text-center">
+                      <div className="flex items-center justify-center gap-1 mb-0.5">
+                        <span className="opacity-40 group-hover:opacity-100 transition-opacity">
+                          {stat.icon}
+                        </span>
+                        <p className="text-[7px] md:text-[8px] text-[#484f58] font-mono uppercase tracking-[0.2em] group-hover:text-[#8b949e] transition-colors">{stat.label}</p>
+                      </div>
+                      <p className={`${aspectRatio === '1:1' ? 'text-lg' : 'text-xl md:text-2xl'} text-white font-black tracking-tighter truncate`}>{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Insight Phrase */}
-              <div className={`relative z-10 ${aspectRatio === '1:1' ? 'mb-4' : 'mb-8'}`}>
-                <p className={`${aspectRatio === '1:1' ? 'text-[12px]' : 'text-[14px] md:text-[16px]'} text-white/80 leading-relaxed border-l-[2px] border-[#39d353] pl-4 py-0 italic`}>
+              <div className={`relative z-20 ${aspectRatio === '1:1' ? 'mb-3' : 'mb-5'}`}>
+                <p className={`${aspectRatio === '1:1' ? 'text-[11px]' : 'text-[12px] md:text-[13px]'} text-white/80 leading-relaxed border-l-[2px] border-[#39d353] pl-3 py-0 italic`}>
                   "{insights.cardInsight}"
                 </p>
               </div>
 
               {/* Footer Grid */}
-              <div className="mt-auto relative z-10 pt-6 border-t border-[#30363d]/30 flex items-center justify-between flex-shrink-0">
-                <div className="flex items-center gap-3 opacity-30 hover:opacity-100 transition-opacity">
-                  <Octicon className="w-4 h-4 text-white">{Icons.GitHub}</Octicon>
-                  <span className="text-[9px] font-mono tracking-[0.3em] font-black uppercase">WRAPPED.DEV</span>
+              <div className="mt-auto relative z-20 pt-4 border-t border-[#30363d]/30 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-2 opacity-30 hover:opacity-100 transition-opacity">
+                  <Octicon className="w-3 h-3 text-white">{Icons.GitHub}</Octicon>
+                  <span className="text-[8px] font-mono tracking-[0.3em] font-black uppercase">WRAPPED.DEV</span>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   {gridCells.map((color, i) => (
-                    <div key={i} className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-[1px]" style={{ backgroundColor: color }}></div>
+                    <div key={i} className="w-3 md:w-4 h-3 md:h-4 rounded-[2px]" style={{ backgroundColor: color }}></div>
                   ))}
                 </div>
               </div>
@@ -277,7 +368,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
         </div>
 
         {/* SIDEBAR ACTIONS & SHARE SYSTEM */}
-        <div className="flex flex-col gap-6 w-full max-w-sm">
+        <div className="flex flex-col gap-6 w-full max-w-sm flex-shrink-0 xl:mt-12">
            <div className="flex flex-col h-full p-8 rounded-[2rem] bg-[#161b22]/40 border border-[#30363d] backdrop-blur-3xl shadow-xl">
              
              {/* Share Hook Selection */}

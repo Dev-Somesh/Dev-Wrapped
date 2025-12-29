@@ -91,6 +91,24 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       stars: repo.stargazers_count
     }));
 
+    // Count repos created in 2024/2025
+    const currentYear = new Date().getFullYear();
+    const reposCreatedThisYear = repos.filter((repo: any) => {
+      if (!repo.created_at) return false;
+      const createdYear = new Date(repo.created_at).getFullYear();
+      return createdYear === currentYear || createdYear === 2024; // Include both 2024 and current year
+    }).length;
+
+    // Calculate total stars received across all repos
+    const totalStarsReceived = repos.reduce((total: number, repo: any) => {
+      return total + (repo.stargazers_count || 0);
+    }, 0);
+
+    // Calculate account age in years
+    const accountCreatedDate = new Date(user.created_at);
+    const currentDate = new Date();
+    const accountAge = Math.max(1, Math.floor((currentDate.getTime() - accountCreatedDate.getTime()) / (1000 * 60 * 60 * 24 * 365)));
+
     repos.forEach((repo: any) => {
       if (repo.language) {
         langMap[repo.language] = (langMap[repo.language] || 0) + 1;
@@ -101,6 +119,11 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
+
+    // Keep all languages for tech stack cloud
+    const allLanguages = Object.entries(langMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
 
     // Process events data
     const activeDaysSet = new Set<string>();
@@ -172,13 +195,23 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       totalCommits,
       activeDays: estimatedActiveDays,
       topLanguages: topLanguages.length > 0 ? topLanguages : [{ name: 'Unknown', count: 0 }],
+      allLanguages: allLanguages.length > 0 ? allLanguages : [{ name: 'Unknown', count: 0 }],
       reposContributed: user.public_repos + (user.total_private_repos || 0),
+      reposCreatedThisYear,
       recentRepos,
       streak: currentStreak,
       mostActiveMonth,
       firstActivity: '2024-01-01',
       lastActivity: dates[0] || new Date().toISOString().split('T')[0],
-      activityPattern
+      activityPattern,
+      // New fields
+      followers: user.followers || 0,
+      following: user.following || 0,
+      totalStarsReceived,
+      accountAge,
+      bio: user.bio || undefined,
+      company: user.company || undefined,
+      location: user.location || undefined,
     };
   } catch (error: any) {
     console.error("GitHub Telemetry Fault:", error);

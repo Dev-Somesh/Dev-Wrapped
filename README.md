@@ -26,69 +26,68 @@
 ---
 
 ## ◈ THE VISION
-**DevWrapped 2025** is an elite Year-in-Review engine that transforms raw GitHub telemetry into a cinematic narrative. By combining **Google Gemini (Flash or Lite)** with your real-world commit history, we reveal the hidden developer archetype behind your contributions.
+**DevWrapped 2025** is an elite Year-in-Review engine that transforms raw GitHub telemetry into a cinematic narrative. By combining **Google Gemini AI** with your real-world commit history, we reveal the hidden developer archetype behind your contributions.
 
----
+## 🚀 Quick Start
 
-## ◒ AUTHENTICATION PROTOCOLS
+1. **Clone & Install**
+   ```bash
+   git clone <repository-url>
+   cd devwrapped-2025
+   npm install
+   ```
 
-The system uses a server-side API key architecture for maximum security:
+2. **Environment Setup**
+   ```bash
+   # Create .env file with your API keys
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-### Global API Key (Server-Side)
-The API key is stored securely on the server and never exposed to the client:
-- **Set `GEMINI_API_KEY`** in your Netlify environment variables (Site settings → Environment variables)
-- The key is used by a serverless function that proxies Gemini API calls
-- **Security**: API keys never appear in client-side code or build output
-- **Privacy**: All AI processing happens server-side via Netlify Functions
+3. **Development**
+   ```bash
+   npm run dev
+   # Visit http://localhost:3000
+   ```
 
-### Deployment Setup
-1. Create a Google Cloud project with Gemini API enabled
-2. Generate a Gemini API key from [Google AI Studio](https://ai.google.dev)
-3. Add `GEMINI_API_KEY` to Netlify environment variables
-4. Deploy - the serverless function will automatically use the key
+4. **Production Build**
+   ```bash
+   npm run build
+   ```
 
----
+## 📚 Documentation
 
-## ⚙︎ ARCHITECTURAL TRACE
+For comprehensive documentation including architecture, deployment, API references, and troubleshooting, see:
 
-```yaml
-intelligence_core:
-  primary: gemini-3-flash-preview (Balanced Performance)
-  role: Narrative Reasoning & Pattern Extraction
-  parameters: JSON_SCHEMA_STRICT
-  architecture: Serverless Function Proxy (Netlify Functions)
-  security: API key stored server-side only
+**[📖 DOCUMENTATION.md](./DOCUMENTATION.md)**
 
-telemetry_engine:
-  provider: GitHub REST API v3
-  data_points: Commits, Language Ratios, Streak Momentum, Seasonality
+## ⚙︎ TECH STACK
 
-frontend_stack:
-  ui: React 19 + Tailwind CSS
-  font_display: Space Grotesk
-  font_technical: JetBrains Mono
-  export_engine: html-to-image (4K Buffer)
+- **Frontend**: React 19, TypeScript, Tailwind CSS
+- **AI Engine**: Google Gemini (Flash/Lite models)
+- **Backend**: Netlify Functions (Serverless)
+- **Build**: Vite
+- **Deployment**: Netlify
 
-backend_stack:
-  runtime: Netlify Functions
-  api_proxy: gemini-proxy (serverless function)
-  key_storage: Environment Variables (never in client bundle)
-```
+## 🔒 PRIVACY & SECURITY
 
----
+- **Zero Data Retention**: No user data stored on servers
+- **Client-Side Processing**: All analysis happens in your browser
+- **Secure API Keys**: Server-side storage only
+- **No Tracking**: No analytics or cookies
 
-## ▣ THE PRIVACY VAULT
-In an era of data harvesting, **DevWrapped** follows a zero-retention policy:
-- **NO** database connections.
-- **NO** tracking cookies.
-- **SERVER_SIDE_API**: API keys are stored server-side and never exposed to clients.
-- **CLIENT_SIDE**: All GitHub data processing happens in your browser.
-- **ZERO_RETENTION**: No user data is stored or logged.
+## 🌟 Features
+
+- **AI-Powered Insights**: Personalized developer narratives
+- **Comprehensive Analysis**: Commits, languages, patterns, and more
+- **Beautiful Visualizations**: Interactive cards and detailed dossiers
+- **Export Capabilities**: High-quality image sharing
+- **Streamlined UX**: Direct flow from input to results
 
 ---
 
 ## ◈ SUPPORT & FEEDBACK
-If the intelligence core encounters a trace failure or you have feedback on the narrative logic:
+- **Complete Documentation**: [DOCUMENTATION.md](./DOCUMENTATION.md)
+- **Issues & Bugs**: GitHub Issues
 - **Direct Support**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
 - **Portfolio**: [someshbhardwaj.me](https://someshbhardwaj.me)
 

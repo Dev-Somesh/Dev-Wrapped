@@ -12,6 +12,11 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
+  // Temporarily disable highlighting to prevent CSS leakage
+  const highlightText = (text: string) => {
+    return text; // Return text as-is without highlighting
+  };
+
   const exportFullReport = async () => {
     if (!reportRef.current) return;
     setIsExporting(true);
@@ -63,6 +68,50 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         ref={reportRef}
         className="bg-[#0d1117] border border-[#30363d] rounded-[3.5rem] p-8 md:p-20 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden"
       >
+        {/* Background GitHub Logos */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* First GitHub logo - top right */}
+          <div 
+            className="absolute opacity-[0.025] select-none"
+            style={{
+              top: '8%',
+              right: '12%',
+              transform: 'rotate(25deg)',
+            }}
+          >
+            <svg width="200" height="200" viewBox="0 0 16 16" fill="#c9d1d9">
+              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            </svg>
+          </div>
+          
+          {/* Second GitHub logo - middle left */}
+          <div 
+            className="absolute opacity-[0.02] select-none"
+            style={{
+              top: '35%',
+              left: '5%',
+              transform: 'rotate(-18deg)',
+            }}
+          >
+            <svg width="180" height="180" viewBox="0 0 16 16" fill="#c9d1d9">
+              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            </svg>
+          </div>
+
+          {/* Third GitHub logo - bottom right */}
+          <div 
+            className="absolute opacity-[0.015] select-none"
+            style={{
+              bottom: '20%',
+              right: '8%',
+              transform: 'rotate(12deg)',
+            }}
+          >
+            <svg width="160" height="160" viewBox="0 0 16 16" fill="#c9d1d9">
+              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            </svg>
+          </div>
+        </div>
         {/* Dossier Header */}
         <div className="flex flex-col md:flex-row justify-between gap-12 mb-20 pb-12 border-b border-[#30363d]">
           <div className="flex items-center gap-8">
@@ -81,24 +130,28 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </div>
 
         {/* Section I */}
-        <section className="mb-24">
+        <section className="mb-24 relative z-10">
           <h5 className="text-[11px] font-mono text-[#39d353] uppercase tracking-[0.7em] mb-10 font-black">Section I // The Narrative</h5>
           <div className="bg-[#161b22]/30 border border-[#30363d] p-12 rounded-[3rem]">
-            <p className="text-2xl md:text-3xl font-display text-[#f0f6fc] leading-relaxed font-light italic opacity-95">
-              {insights.narrative}
-            </p>
+            <p 
+              className="text-lg md:text-xl font-display text-[#f0f6fc] leading-relaxed font-light italic opacity-95"
+              dangerouslySetInnerHTML={{ __html: highlightText(insights.narrative) }}
+            />
           </div>
         </section>
 
         {/* Section II & III */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24 relative z-10">
           <section>
             <h5 className="text-[11px] font-mono text-purple-500 uppercase tracking-[0.7em] mb-10 font-black">Section II // Intelligence Observations</h5>
             <div className="space-y-6">
               {insights.insights.map((ins, i) => (
                 <div key={i} className="flex gap-6 p-7 bg-white/5 rounded-[2rem] border border-white/5 transition-all hover:bg-white/10">
                   <span className="text-purple-500 font-mono text-[12px] pt-1 font-black">0{i+1}</span>
-                  <p className="text-base text-[#c9d1d9] leading-relaxed font-light">{ins}</p>
+                  <p 
+                    className="text-base text-[#c9d1d9] leading-relaxed font-light"
+                    dangerouslySetInnerHTML={{ __html: highlightText(ins) }}
+                  />
                 </div>
               ))}
             </div>
@@ -109,7 +162,10 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
               {insights.patterns.map((pat, i) => (
                 <div key={i} className="flex gap-6 p-7 bg-white/5 rounded-[2rem] border border-white/5 transition-all hover:bg-white/10">
                   <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">PK</span>
-                  <p className="text-base text-[#c9d1d9] leading-relaxed font-light">{pat}</p>
+                  <p 
+                    className="text-base text-[#c9d1d9] leading-relaxed font-light"
+                    dangerouslySetInnerHTML={{ __html: highlightText(pat) }}
+                  />
                 </div>
               ))}
             </div>
@@ -124,7 +180,11 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
               { label: 'Total Contributions', val: stats.totalCommits },
               { label: 'Active Cycle Days', val: stats.activeDays },
               { label: 'Longest Streak', val: `${stats.streak}d` },
-              { label: 'Peak Cycle Month', val: stats.mostActiveMonth }
+              { label: 'Peak Cycle Month', val: stats.mostActiveMonth },
+              { label: 'Total Stars', val: stats.totalStarsReceived },
+              { label: 'Years Active', val: stats.accountAge ? `${stats.accountAge}y` : 'N/A' },
+              { label: 'Followers', val: stats.followers },
+              { label: 'Following', val: stats.following },
             ].map((m, i) => (
               <div key={i} className="p-10 rounded-[2.5rem] bg-[#161b22]/40 border border-[#30363d] text-center shadow-xl hover:scale-105 transition-transform duration-500 flex flex-col justify-center items-center">
                 <span className="block text-3xl lg:text-4xl font-display font-black text-white mb-3 whitespace-nowrap">{m.val}</span>
@@ -132,13 +192,97 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
               </div>
             ))}
           </div>
+
+          {/* Profile Information Row */}
+          {(stats.bio || stats.company || stats.location) && (
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+              {stats.bio && (
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-3 font-black">Bio</h6>
+                  <p className="text-sm text-white leading-relaxed">{stats.bio}</p>
+                </div>
+              )}
+              
+              {stats.company && (
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-3 font-black">Company</h6>
+                  <p className="text-sm text-white font-medium">{stats.company}</p>
+                </div>
+              )}
+              
+              {stats.location && (
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-3 font-black">Location</h6>
+                  <p className="text-sm text-white font-medium">{stats.location}</p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Section V */}
         <section className="mb-24">
           <h5 className="text-[11px] font-mono text-white uppercase tracking-[0.7em] mb-10 font-black">Section V // Technical DNA Landscape</h5>
+          
+          {/* Tech Stack Logo Cloud */}
+          <div className="mb-12">
+            <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-6 font-black text-center">Technology Stack</h6>
+            <div className="flex flex-wrap justify-center items-center gap-4 p-8 bg-[#161b22]/20 rounded-2xl border border-[#30363d]/30">
+              {stats.allLanguages.slice(0, 15).map((lang, i) => {
+                // Map languages to colors and icons
+                const getTechStyle = (language: string) => {
+                  const techStyles: Record<string, { color: string; bg: string }> = {
+                    'JavaScript': { color: '#f7df1e', bg: 'rgba(247, 223, 30, 0.1)' },
+                    'TypeScript': { color: '#3178c6', bg: 'rgba(49, 120, 198, 0.1)' },
+                    'Python': { color: '#3776ab', bg: 'rgba(55, 118, 171, 0.1)' },
+                    'Java': { color: '#ed8b00', bg: 'rgba(237, 139, 0, 0.1)' },
+                    'React': { color: '#61dafb', bg: 'rgba(97, 218, 251, 0.1)' },
+                    'Vue': { color: '#4fc08d', bg: 'rgba(79, 192, 141, 0.1)' },
+                    'Angular': { color: '#dd0031', bg: 'rgba(221, 0, 49, 0.1)' },
+                    'Node.js': { color: '#339933', bg: 'rgba(51, 153, 51, 0.1)' },
+                    'Go': { color: '#00add8', bg: 'rgba(0, 173, 216, 0.1)' },
+                    'Rust': { color: '#000000', bg: 'rgba(0, 0, 0, 0.1)' },
+                    'C++': { color: '#00599c', bg: 'rgba(0, 89, 156, 0.1)' },
+                    'C#': { color: '#239120', bg: 'rgba(35, 145, 32, 0.1)' },
+                    'PHP': { color: '#777bb4', bg: 'rgba(119, 123, 180, 0.1)' },
+                    'Ruby': { color: '#cc342d', bg: 'rgba(204, 52, 45, 0.1)' },
+                    'Swift': { color: '#fa7343', bg: 'rgba(250, 115, 67, 0.1)' },
+                    'Kotlin': { color: '#7f52ff', bg: 'rgba(127, 82, 255, 0.1)' },
+                    'HTML': { color: '#e34f26', bg: 'rgba(227, 79, 38, 0.1)' },
+                    'CSS': { color: '#1572b6', bg: 'rgba(21, 114, 182, 0.1)' },
+                    'Shell': { color: '#89e051', bg: 'rgba(137, 224, 81, 0.1)' },
+                    'Dockerfile': { color: '#384d54', bg: 'rgba(56, 77, 84, 0.1)' },
+                  };
+                  
+                  return techStyles[language] || { color: '#8b949e', bg: 'rgba(139, 148, 158, 0.1)' };
+                };
+
+                const style = getTechStyle(lang.name);
+                const size = Math.max(12, Math.min(24, 12 + (lang.count * 2))); // Size based on usage
+
+                return (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center p-3 rounded-xl transition-all hover:scale-110 cursor-default"
+                    style={{ backgroundColor: style.bg }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center mb-2 font-black text-xs"
+                      style={{ backgroundColor: style.color, color: '#000' }}
+                    >
+                      {lang.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <span className="text-[9px] font-mono text-white font-medium">{lang.name}</span>
+                    <span className="text-[8px] font-mono text-[#8b949e]">{lang.count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div className="col-span-1 space-y-5">
+              <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-4 font-black">Top Languages</h6>
               {stats.topLanguages.map((lang, i) => (
                 <div key={i} className="flex justify-between items-center p-6 rounded-2xl bg-white/5 border border-white/5">
                   <span className="text-base text-white font-bold">{lang.name}</span>
@@ -147,6 +291,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
               ))}
             </div>
             <div className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <h6 className="col-span-full text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 font-black">Recent Projects</h6>
               {stats.recentRepos.slice(0, 4).map((repo, i) => (
                 <div key={i} className="p-8 rounded-2xl bg-white/5 border border-white/5 flex flex-col hover:border-white/20 transition-colors">
                   <h6 className="text-xl font-black text-white mb-3 truncate">{repo.name}</h6>
@@ -157,6 +302,44 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Activity Grid Section */}
+        <section className="mb-24">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-full max-w-2xl">
+              {/* Horizontal Activity Grid */}
+              <div className="flex justify-center items-center gap-1 p-4 bg-[#161b22]/20 rounded-xl">
+                {Array.from({ length: 52 }).map((_, i) => {
+                  const intensity = Math.random();
+                  let bgColor = 'rgba(22, 27, 34, 0.6)'; // No activity - reduced opacity
+                  if (intensity > 0.7) bgColor = 'rgba(57, 211, 83, 0.7)'; // High activity - reduced opacity
+                  else if (intensity > 0.5) bgColor = 'rgba(38, 166, 65, 0.7)'; // Medium activity - reduced opacity
+                  else if (intensity > 0.3) bgColor = 'rgba(13, 68, 41, 0.7)'; // Low activity - reduced opacity
+                  
+                  return (
+                    <div
+                      key={i}
+                      className="w-3 h-3 rounded-sm"
+                      style={{ backgroundColor: bgColor }}
+                    />
+                  );
+                })}
+              </div>
+              
+              {/* Simple Legend */}
+              <div className="flex items-center justify-center mt-3 space-x-2">
+                <span className="text-[9px] font-mono text-[#8b949e]">Less</span>
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: 'rgba(22, 27, 34, 0.6)' }}></div>
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: 'rgba(13, 68, 41, 0.7)' }}></div>
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: 'rgba(38, 166, 65, 0.7)' }}></div>
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: 'rgba(57, 211, 83, 0.7)' }}></div>
+                </div>
+                <span className="text-[9px] font-mono text-[#8b949e]">More</span>
+              </div>
             </div>
           </div>
         </section>
