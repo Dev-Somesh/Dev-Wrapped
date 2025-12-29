@@ -1,73 +1,65 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
 import { GitHubStats, AIInsights } from "../types";
 
+/**
+ * Calls the Netlify serverless function to generate AI insights.
+ * The API key is stored server-side and never exposed to the client.
+ */
 export const generateAIWrapped = async (stats: GitHubStats, modelName: string = "gemini-3-flash-preview"): Promise<AIInsights> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
-  const prompt = `
-    Analyze this developer's 2024-2025 GitHub activity. Create a cinematic "Year Wrapped" narrative.
-    
-    DEVELOPER TELEMETRY:
-    - User: ${stats.username}
-    - Contributions: ${stats.totalCommits}
-    - Active Span: ${stats.activeDays} days
-    - Focus Stack: ${stats.topLanguages.map(l => l.name).join(', ')}
-    - Scope: ${stats.reposContributed} repositories
-    - Momentum: ${stats.streak} day streak
-    - Seasonality: Peak work in ${stats.mostActiveMonth}
-    
-    OUTPUT SCHEMA (JSON ONLY):
-    1. archetype: A bold developer persona.
-    2. archetypeDescription: A poetic 1-sentence definition.
-    3. insights: 3 specific behavioral traces from their code activity.
-    4. patterns: 2 high-level development rhythms detected.
-    5. narrative: A 3-paragraph cinematic story of their journey.
-    6. cardInsight: A punchy 10-word quote for social sharing.
-    
-    TONE: Professional, sophisticated, narrative-first.
-  `;
-
   try {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            archetype: { type: Type.STRING },
-            archetypeDescription: { type: Type.STRING },
-            insights: { type: Type.ARRAY, items: { type: Type.STRING } },
-            patterns: { type: Type.ARRAY, items: { type: Type.STRING } },
-            narrative: { type: Type.STRING },
-            cardInsight: { type: Type.STRING }
-          },
-          required: ["archetype", "archetypeDescription", "insights", "patterns", "narrative", "cardInsight"]
-        }
-      }
+    // Call the serverless function that proxies Gemini API calls
+    // The function uses GEMINI_API_KEY from Netlify environment variables
+    const response = await fetch('/.netlify/functions/gemini-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        stats,
+        modelName,
+      }),
     });
 
-    if (!response.text) {
-      throw new Error("GEMINI_NULL_TRACE: The intelligence core returned an empty narrative.");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      const errorMessage = errorData.error || `HTTP ${response.status}`;
+      
+      // Map HTTP status codes to appropriate error messages
+      if (response.status === 401 || errorMessage.includes('AUTH_INVALID')) {
+        throw new Error('GEMINI_AUTH_INVALID: The API Key is unauthorized. Please check Netlify environment variables.');
+      }
+      if (response.status === 429 || errorMessage.includes('RATE_LIMIT')) {
+        throw new Error('GEMINI_RATE_LIMIT: Model quota exceeded. Please wait a few seconds before retrying.');
+      }
+      if (response.status === 400 && errorMessage.includes('SAFETY')) {
+        throw new Error('GEMINI_SAFETY_BLOCK: The intelligence core filtered this user\'s profile content for safety.');
+      }
+      if (response.status === 500 && errorMessage.includes('not configured')) {
+        throw new Error('GEMINI_CONFIG_ERROR: GEMINI_API_KEY is not configured in Netlify environment variables.');
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    
+    // Validate response structure
+    if (!data.archetype || !data.narrative) {
+      throw new Error('GEMINI_NULL_TRACE: The intelligence core returned an invalid response.');
     }
     
-    return JSON.parse(response.text);
+    return data as AIInsights;
   } catch (error: any) {
-    // Advanced error classification for Gemini
-    const errorMessage = error.message || "";
-    
-    if (errorMessage.includes("API_KEY_INVALID") || errorMessage.includes("key")) {
-      throw new Error("GEMINI_AUTH_INVALID: The provided API Key is unauthorized. Please verify your session key.");
-    }
-    if (errorMessage.includes("429") || errorMessage.includes("QUOTA")) {
-      throw new Error("GEMINI_RATE_LIMIT: Model quota exceeded. Please wait a few seconds before retrying.");
-    }
-    if (errorMessage.includes("SAFETY")) {
-      throw new Error("GEMINI_SAFETY_BLOCK: The intelligence core filtered this user's profile content for safety.");
+    // Re-throw if it's already a properly formatted error
+    if (error.message && error.message.startsWith('GEMINI_')) {
+      throw error;
     }
     
-    throw new Error(`GEMINI_INTERNAL_ERROR: ${errorMessage || 'Session failed to initialize.'}`);
+    // Handle network errors
+    if (error.message && (error.message.includes('fetch') || error.message.includes('network'))) {
+      throw new Error('NETWORK_ERROR: Failed to connect to the AI service. Please check your connection.');
+    }
+    
+    throw new Error(`GEMINI_INTERNAL_ERROR: ${error.message || 'Session failed to initialize.'}`);
   }
 };

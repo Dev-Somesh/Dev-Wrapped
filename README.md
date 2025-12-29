@@ -26,18 +26,20 @@
 
 ## ◒ AUTHENTICATION PROTOCOLS
 
-The system operates on two distinct authorization layers:
+The system uses a server-side API key architecture for maximum security:
 
-### 1. The Session Key (BYOK)
-For maximum privacy and scalability, users can authorize a volatile session using their own Google Cloud Project. 
-- **Free Tier Supported**: You can use a standard free Gemini API key by choosing the "Flash Lite" model or using the standard "Flash 3" model within its free-tier limits.
-- **Requirement**: A Google Cloud project with the Gemini API enabled.
-- **Security**: Keys are never stored; they exist only in memory during the analysis trace.
+### Global API Key (Server-Side)
+The API key is stored securely on the server and never exposed to the client:
+- **Set `GEMINI_API_KEY`** in your Netlify environment variables (Site settings → Environment variables)
+- The key is used by a serverless function that proxies Gemini API calls
+- **Security**: API keys never appear in client-side code or build output
+- **Privacy**: All AI processing happens server-side via Netlify Functions
 
-### 2. The Global Key (Developer Deployment)
-If you are hosting this for a specific team or audience and wish to provide the AI credits:
-- Set `API_KEY` in your hosting environment (e.g., Netlify/Vercel Environment Variables).
-- The system will detect this key and bypass the "Authorize Session" screen for all users.
+### Deployment Setup
+1. Create a Google Cloud project with Gemini API enabled
+2. Generate a Gemini API key from [Google AI Studio](https://ai.google.dev)
+3. Add `GEMINI_API_KEY` to Netlify environment variables
+4. Deploy - the serverless function will automatically use the key
 
 ---
 
@@ -46,9 +48,10 @@ If you are hosting this for a specific team or audience and wish to provide the 
 ```yaml
 intelligence_core:
   primary: gemini-3-flash-preview (Balanced Performance)
-  economy: gemini-flash-lite-latest (Free Tier Optimized)
   role: Narrative Reasoning & Pattern Extraction
   parameters: JSON_SCHEMA_STRICT
+  architecture: Serverless Function Proxy (Netlify Functions)
+  security: API key stored server-side only
 
 telemetry_engine:
   provider: GitHub REST API v3
@@ -59,6 +62,11 @@ frontend_stack:
   font_display: Space Grotesk
   font_technical: JetBrains Mono
   export_engine: html-to-image (4K Buffer)
+
+backend_stack:
+  runtime: Netlify Functions
+  api_proxy: gemini-proxy (serverless function)
+  key_storage: Environment Variables (never in client bundle)
 ```
 
 ---
@@ -67,8 +75,9 @@ frontend_stack:
 In an era of data harvesting, **DevWrapped** follows a zero-retention policy:
 - **NO** database connections.
 - **NO** tracking cookies.
-- **VOLATILE_AUTH**: Tokens are purged instantly upon session close.
+- **SERVER_SIDE_API**: API keys are stored server-side and never exposed to clients.
 - **CLIENT_SIDE**: All GitHub data processing happens in your browser.
+- **ZERO_RETENTION**: No user data is stored or logged.
 
 ---
 
