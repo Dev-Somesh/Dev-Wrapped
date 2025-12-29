@@ -1,48 +1,50 @@
 
 import { GitHubStats, GitHubRepo } from '../types';
 
-export const fetchGitHubData = async (username: string, token?: string): Promise<GitHubStats> => {
-  const headers: Record<string, string> = {
-    'Accept': 'application/vnd.github.v3+json',
-  };
-  if (token) {
-    headers['Authorization'] = `token ${token}`;
+/**
+ * Calls the Netlify serverless function to proxy GitHub API calls.
+ * This avoids CORS issues and keeps tokens server-side.
+ */
+const fetchViaProxy = async (endpoint: string, username: string, token?: string) => {
+  const response = await fetch('/.netlify/functions/github-proxy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      token,
+      endpoint,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(errorData.error || `HTTP ${response.status}`);
   }
 
-  const fetchWithAuth = async (url: string) => {
-    const res = await fetch(url, { headers });
-    if (!res.ok) {
-      // Robust Error Reporting based on status codes
-      if (res.status === 401) {
-        throw new Error('GITHUB_AUTH_INVALID: The provided Personal Access Token is unauthorized or has expired.');
-      }
-      if (res.status === 403) {
-        const rateLimitRemaining = res.headers.get('x-ratelimit-remaining');
-        if (rateLimitRemaining === '0') {
-          throw new Error('GITHUB_RATE_LIMIT: API quota exceeded. Please use a Personal Access Token to increase your limits.');
-        }
-        throw new Error('GITHUB_FORBIDDEN: Access denied. This may be due to repository privacy restrictions.');
-      }
-      if (res.status === 404) {
-        throw new Error(`GITHUB_USER_NOT_FOUND: The user profile "${username}" does not exist.`);
-      }
-      if (res.status >= 500) {
-        throw new Error('GITHUB_SERVER_OFFLINE: GitHub services are currently experiencing high latency or downtime.');
-      }
-      throw new Error(`GITHUB_CORE_ERROR: Received status ${res.status} from telemetry source.`);
+  return response.json();
+};
+
+export const fetchGitHubData = async (username: string, token?: string): Promise<GitHubStats> => {
+  const fetchWithAuth = async (endpoint: string) => {
+    try {
+      return await fetchViaProxy(endpoint, username, token);
+    } catch (error: any) {
+      // Re-throw with proper error message
+      throw error;
     }
-    return res.json();
   };
 
   try {
-    const userData = await fetchWithAuth(`https://api.github.com/users/${username}`);
+    const userData = await fetchWithAuth(`/users/${username}`);
     
     const commitSearch = await fetchWithAuth(
-      `https://api.github.com/search/commits?q=author:${username}+committer-date:>=2024-01-01&per_page=1`
+      `/search/commits?q=author:${username}+committer-date:>=2024-01-01&per_page=1`
     );
     const totalCommits = commitSearch.total_count || 0;
 
-    const reposData = await fetchWithAuth(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+    const reposData = await fetchWithAuth(`/users/${username}/repos?sort=updated&per_page=100`);
     
     const langMap: Record<string, number> = {};
     const recentRepos: GitHubRepo[] = reposData.slice(0, 5).map((repo: any) => ({
@@ -64,7 +66,7 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const events = await fetchWithAuth(`https://api.github.com/users/${username}/events?per_page=100`);
+    const events = await fetchWithAuth(`/users/${username}/events?per_page=100`);
 
     const activeDaysSet = new Set<string>();
     const dates: string[] = [];
