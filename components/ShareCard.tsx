@@ -485,6 +485,30 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                </div>
              </div>
 
+             {/* Product Hunt Review CTA */}
+             <div className="mt-6 p-4 bg-gradient-to-r from-[#ff6154]/10 to-[#ff9500]/10 border border-[#ff6154]/20 rounded-xl text-center">
+               <p className="text-[11px] font-mono text-[#c9d1d9] mb-3 leading-relaxed">
+                 🎉 <span className="text-[#ff6154] font-semibold">Enjoyed your DevWrapped?</span> Help us reach more developers!
+               </p>
+               <a
+                 href="https://www.producthunt.com/products/devwrapped-2025/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-devwrapped-2025"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="inline-block hover:scale-105 transition-transform"
+               >
+                 <img 
+                   src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1143033&theme=neutral" 
+                   alt="DevWrapped 2025 - DevWrapped 2025 – Your GitHub year, told as a story | Product Hunt" 
+                   width="200" 
+                   height="43" 
+                   className="rounded"
+                 />
+               </a>
+               <p className="text-[9px] font-mono text-[#8b949e] mt-2 opacity-70">
+                 Your upvote helps other developers discover their coding story ✨
+               </p>
+             </div>
+
              <div className="mt-auto">
                <button 
                  onClick={onReset}
