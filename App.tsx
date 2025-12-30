@@ -247,7 +247,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Bottom Section - Community & Engagement */}
-        <div className="border-t border-white/5 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[8px] md:text-[9px] font-mono">
+        <div className="border-t border-white/5 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] md:text-[11px] font-mono">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-[#8b949e]">
             <a
               href="https://github.com/Dev-Somesh/Dev-Wrapped/issues"
@@ -283,9 +283,24 @@ const App: React.FC = () => {
               </svg>
               Star Project
             </a>
+            {/* Product Hunt Badge */}
+            <a
+              href="https://www.producthunt.com/products/devwrapped-2025?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-devwrapped-2025"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:scale-105 transition-transform"
+            >
+              <img 
+                alt="DevWrapped 2025 - DevWrapped 2025 – Your GitHub year, told as a story | Product Hunt" 
+                width="150" 
+                height="32" 
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056052&theme=neutral&t=1767079194394"
+                className="rounded"
+              />
+            </a>
           </div>
           
-          <div className="flex items-center gap-2 text-[#484f58]">
+          <div className="flex items-center gap-2 text-[#484f58] text-[10px] md:text-[11px]">
             <span>Made with</span>
             <span className="text-[#ff7b72]">❤️</span>
             <span>for the developer community</span>
