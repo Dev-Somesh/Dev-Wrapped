@@ -56,7 +56,8 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
     // These 3 calls don't depend on each other and can run simultaneously
     const [userData, reposData, eventsData] = await Promise.allSettled([
       fetchViaProxy(`/users/${username}`, username, token, 5000),
-      fetchViaProxy(`/users/${username}/repos?sort=updated&per_page=100`, username, token, 8000),
+      // Include private repos when token is provided using type=all parameter
+      fetchViaProxy(`/users/${username}/repos?sort=updated&per_page=100${token ? '&type=all' : ''}`, username, token, 8000),
       // Reduced from 100 to 30 events - sufficient for activity pattern analysis
       fetchViaProxy(`/users/${username}/events?per_page=30`, username, token, 8000),
     ]);
@@ -163,6 +164,8 @@ export const fetchGitHubData = async (username: string, token?: string): Promise
     // Use a shorter timeout since we already have most data
     let totalCommits = 0;
     try {
+      // When token is provided, GitHub search API automatically includes private repos
+      // that the token has access to in the search results
       const commitSearchResult = await Promise.race([
         fetchViaProxy(
           `/search/commits?q=author:${username}+committer-date:>=2024-01-01&per_page=1`,
