@@ -34,6 +34,15 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
   const exportFullReport = async () => {
     if (!reportRef.current) return;
     setIsExporting(true);
+    
+    // Track dossier export attempt
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'dossier_export_started', {
+        username: stats.username,
+        archetype: insights.archetype
+      });
+    }
+    
     try {
       const dataUrl = await toPng(reportRef.current, { 
         cacheBust: true,
@@ -47,9 +56,25 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
       link.download = `dev-dossier-2025-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
+      
+      // Track successful dossier export
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity('event', 'dossier_export_success', {
+          username: stats.username,
+          archetype: insights.archetype
+        });
+      }
     } catch (err) {
       console.error('Export failed:', err);
       window.print();
+      
+      // Track dossier export failure (fallback to print)
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity('event', 'dossier_export_failed_print_fallback', {
+          username: stats.username,
+          error: err instanceof Error ? err.message : 'Unknown error'
+        });
+      }
     } finally {
       setIsExporting(false);
     }

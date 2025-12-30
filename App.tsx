@@ -68,6 +68,13 @@ const App: React.FC = () => {
     setStep(Step.Analysis);
     setError(null);
     
+    // Track analysis start
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'analysis_started', {
+        username: user
+      });
+    }
+    
     try {
       const fetchedStats = await fetchGitHubData(user); // Remove token parameter
       setStats(fetchedStats);
@@ -76,7 +83,21 @@ const App: React.FC = () => {
       setInsights(fetchedInsights);
       
       // Skip intermediate steps and go directly to Share page
-      setTimeout(() => setStep(Step.Share), 3500);
+      setTimeout(() => {
+        setStep(Step.Share);
+        
+        // Track successful analysis completion and results page view
+        if (typeof window !== 'undefined' && (window as any).clarity) {
+          (window as any).clarity('event', 'results_page_reached', {
+            username: user,
+            archetype: fetchedInsights.archetype,
+            total_commits: fetchedStats.totalCommits,
+            active_days: fetchedStats.activeDays,
+            streak: fetchedStats.streak,
+            top_language: fetchedStats.topLanguages[0]?.name || 'Unknown'
+          });
+        }
+      }, 3500);
     } catch (err: any) {
       // Detailed Diagnostic Logging
       logDiagnosticData(err, { username: user, step: Step[step], model: activeModel });
@@ -101,7 +122,16 @@ const App: React.FC = () => {
 
   const prevStep = () => {
     // From Share page, go back to Entry to restart
-    if (step === Step.Share) setStep(Step.Entry);
+    if (step === Step.Share) {
+      setStep(Step.Entry);
+      
+      // Track restart action
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity('event', 'analysis_restarted', {
+          previous_username: stats?.username || 'unknown'
+        });
+      }
+    }
   };
 
   const renderStep = () => {

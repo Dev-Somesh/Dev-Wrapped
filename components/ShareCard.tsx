@@ -44,6 +44,18 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   const [activeHook, setActiveHook] = useState(0);
   const [traceId, setTraceId] = useState('FETCHING...');
 
+  // Track page view when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'share_card_viewed', {
+        username: stats.username,
+        archetype: insights.archetype,
+        total_commits: stats.totalCommits,
+        active_days: stats.activeDays
+      });
+    }
+  }, [stats.username, insights.archetype, stats.totalCommits, stats.activeDays]);
+
   // Temporary fallback: extract number from AI insight if API data is missing
   const extractRepoCountFromInsight = () => {
     if (stats.reposCreatedThisYear !== undefined && stats.reposCreatedThisYear !== null) {
@@ -114,6 +126,16 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   const downloadImage = async () => {
     if (!cardRef.current) return;
     setIsExporting(true);
+    
+    // Track export attempt with Microsoft Clarity
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'share_card_export_started', {
+        username: stats.username,
+        archetype: insights.archetype,
+        aspect_ratio: aspectRatio
+      });
+    }
+    
     try {
       const originalTransform = cardRef.current.style.transform;
       cardRef.current.style.transform = 'none';
@@ -133,8 +155,25 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       link.download = `devwrapped-2025-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
+      
+      // Track successful export
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity('event', 'share_card_export_success', {
+          username: stats.username,
+          archetype: insights.archetype,
+          aspect_ratio: aspectRatio
+        });
+      }
     } catch (err) {
       console.error('Export failed:', err);
+      
+      // Track export failure
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity('event', 'share_card_export_failed', {
+          username: stats.username,
+          error: err instanceof Error ? err.message : 'Unknown error'
+        });
+      }
     } finally {
       setIsExporting(false);
     }
@@ -210,10 +249,20 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
         >
           {/* Ratio Selector */}
           <div className="flex bg-[#161b22]/90 backdrop-blur-2xl p-1.5 rounded-full border border-[#30363d] shadow-2xl z-20">
-            {(['1:1', '4:5', '9:16'] as AspectRatio[]).map((r) => (
+               {(['1:1', '4:5', '9:16'] as AspectRatio[]).map((r) => (
               <button
                 key={r}
-                onClick={() => setAspectRatio(r)}
+                onClick={() => {
+                  setAspectRatio(r);
+                  // Track aspect ratio change
+                  if (typeof window !== 'undefined' && (window as any).clarity) {
+                    (window as any).clarity('event', 'aspect_ratio_changed', {
+                      username: stats.username,
+                      new_ratio: r,
+                      previous_ratio: aspectRatio
+                    });
+                  }
+                }}
                 className={`px-4 py-2 rounded-full text-[10px] font-mono uppercase tracking-widest transition-all ${aspectRatio === r ? 'bg-[#39d353] text-black font-black' : 'text-[#8b949e] hover:text-white'}`}
               >
                 {r}
@@ -378,7 +427,17 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    }}
                  />
                  <button 
-                  onClick={() => setActiveHook((activeHook + 1) % hooks.length)}
+                  onClick={() => {
+                    setActiveHook((activeHook + 1) % hooks.length);
+                    // Track hook cycling
+                    if (typeof window !== 'undefined' && (window as any).clarity) {
+                      (window as any).clarity('event', 'share_hook_cycled', {
+                        username: stats.username,
+                        new_hook_type: hooks[(activeHook + 1) % hooks.length].type,
+                        current_hook_type: hooks[activeHook].type
+                      });
+                    }
+                  }}
                   className="absolute bottom-2 right-4 text-[9px] font-mono text-[#39d353] hover:text-white transition-colors uppercase font-black"
                  >
                    [Cycle_Hook]
@@ -408,6 +467,17 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                  onClick={() => {
                    const personalizedText = `${hooks[activeHook].text}\n\n🎬 Just got my DevWrapped 2025 results!\n\nArchetype: ${insights.archetype}\n"${insights.archetypeDescription}"\n\n2025 Highlights:\n• ${stats.totalCommits} contributions across ${stats.activeDays} active days\n• ${stats.streak} day longest streak\n• Top languages: ${stats.topLanguages.map(l => l.name).join(', ')}\n\nThe AI insights were surprisingly accurate! Try yours at https://devwrapped.netlify.app\n\n#DevWrapped2025 #YearInCode #GitHub #DeveloperStory`;
                    navigator.clipboard.writeText(personalizedText);
+                   
+                   // Track text copy with Microsoft Clarity
+                   if (typeof window !== 'undefined' && (window as any).clarity) {
+                     (window as any).clarity('event', 'personalized_text_copied', {
+                       username: stats.username,
+                       archetype: insights.archetype,
+                       hook_type: hooks[activeHook].type,
+                       text_length: personalizedText.length
+                     });
+                   }
+                   
                    // Show temporary feedback
                    const button = event.target as HTMLButtonElement;
                    const originalText = button.textContent;
@@ -429,6 +499,16 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    href="https://www.linkedin.com/feed/"
                    target="_blank"
                    rel="noreferrer"
+                   onClick={() => {
+                     // Track LinkedIn click
+                     if (typeof window !== 'undefined' && (window as any).clarity) {
+                       (window as any).clarity('event', 'social_platform_opened', {
+                         platform: 'linkedin',
+                         username: stats.username,
+                         archetype: insights.archetype
+                       });
+                     }
+                   }}
                    className="flex flex-col items-center gap-1 p-3 bg-[#0077b5]/10 hover:bg-[#0077b5]/20 border border-[#0077b5]/20 hover:border-[#0077b5] rounded-lg text-[#0077b5] hover:text-[#00a0dc] transition-all"
                    title="Open LinkedIn"
                  >
@@ -442,6 +522,16 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    href="https://twitter.com/compose/tweet"
                    target="_blank"
                    rel="noreferrer"
+                   onClick={() => {
+                     // Track Twitter/X click
+                     if (typeof window !== 'undefined' && (window as any).clarity) {
+                       (window as any).clarity('event', 'social_platform_opened', {
+                         platform: 'twitter',
+                         username: stats.username,
+                         archetype: insights.archetype
+                       });
+                     }
+                   }}
                    className="flex flex-col items-center gap-1 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-[#c9d1d9] hover:text-white transition-all"
                    title="Open X (Twitter)"
                  >
