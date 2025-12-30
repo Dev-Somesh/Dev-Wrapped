@@ -50,7 +50,7 @@ export const handler: Handler = async (event, context) => {
   }
 
   try {
-    const { username, token, endpoint } = JSON.parse(event.body || '{}');
+    const { username, endpoint } = JSON.parse(event.body || '{}');
 
     if (!username || !endpoint) {
       return {
@@ -84,19 +84,13 @@ export const handler: Handler = async (event, context) => {
     // Replace username placeholder if present
     url = url.replace('{username}', username);
 
-    // Prepare headers
+    // Prepare headers for public API access
     const headers: Record<string, string> = {
       'Accept': 'application/vnd.github.v3+json',
       'User-Agent': 'DevWrapped-2025',
     };
 
-    // Add authorization if token is provided
-    if (token) {
-      headers['Authorization'] = `token ${token}`;
-      console.log('GitHub proxy: Using token authentication for', endpoint);
-    } else {
-      console.log('GitHub proxy: Using unauthenticated request for', endpoint);
-    }
+    console.log('GitHub proxy: Using public API access for', endpoint);
 
     // Create timeout controller
     const controller = createTimeoutController(GITHUB_API_TIMEOUT_MS);
@@ -134,9 +128,9 @@ export const handler: Handler = async (event, context) => {
       } else if (response.status === 403) {
         const rateLimitRemaining = response.headers.get('x-ratelimit-remaining');
         if (rateLimitRemaining === '0') {
-          errorMessage = 'GITHUB_RATE_LIMIT: API quota exceeded. Please use a Personal Access Token to increase your limits.';
+          errorMessage = 'GITHUB_RATE_LIMIT: API quota exceeded. Please wait a moment before trying again.';
         } else {
-          errorMessage = 'GITHUB_FORBIDDEN: Access denied. This may be due to repository privacy restrictions.';
+          errorMessage = 'GITHUB_FORBIDDEN: Access denied to this resource.';
         }
       } else if (response.status === 404) {
         errorMessage = `GITHUB_USER_NOT_FOUND: The user profile "${username}" does not exist.`;

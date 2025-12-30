@@ -64,12 +64,12 @@ const App: React.FC = () => {
   const [activeModel] = useState("gemini-3-flash-preview");
   const [showCredits, setShowCredits] = useState(false);
 
-  const startAnalysis = async (user: string, token?: string) => {
+  const startAnalysis = async (user: string) => {
     setStep(Step.Analysis);
     setError(null);
     
     try {
-      const fetchedStats = await fetchGitHubData(user, token);
+      const fetchedStats = await fetchGitHubData(user); // Remove token parameter
       setStats(fetchedStats);
       
       const fetchedInsights = await generateAIWrapped(fetchedStats, activeModel);

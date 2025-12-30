@@ -24,7 +24,7 @@ export interface GitHubStats {
   firstActivity: string;
   lastActivity: string;
   activityPattern: 'burst' | 'consistent' | 'sporadic';
-  contributionGrid?: { date: string; count: number; level: number }[]; // New: Contribution grid data
+  contributionGrid?: { month: string; count: number; level: number }[]; // New: Monthly activity data
   // New fields
   followers: number;
   following: number;

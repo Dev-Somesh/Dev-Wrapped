@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface LandingProps {
-  onConnect: (username: string, token?: string) => void;
+  onConnect: (username: string) => void; // Remove token parameter
   error: string | null;
 }
 
@@ -32,13 +32,11 @@ const FeaturePreview: React.FC<{
 
 const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
   const [username, setUsername] = useState('');
-  const [token, setToken] = useState('');
-  const [showTokenInfo, setShowTokenInfo] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim()) {
-      onConnect(username.trim(), token.trim() || undefined);
+      onConnect(username.trim()); // Remove token parameter
     }
   };
 
@@ -188,34 +186,12 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
                     className="w-full bg-[#0d1117] border border-[#30363d] rounded-2xl pl-16 pr-6 py-5 text-[#f0f6fc] placeholder:text-[#484f58] focus:outline-none focus:ring-4 focus:ring-[#39d353]/5 focus:border-[#39d353] transition-all text-lg font-medium"
                   />
                 </div>
-
-                <div className="relative group/input">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-[#484f58] group-focus-within/input:text-[#58a6ff] transition-colors">
-                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
-                  </div>
-                  <input
-                    type="password"
-                    value={token}
-                    onChange={(e) => setToken(e.target.value)}
-                    placeholder="Auth Token (Optional)"
-                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-2xl pl-16 pr-14 py-5 text-[#f0f6fc] placeholder:text-[#484f58] focus:outline-none focus:ring-4 focus:ring-[#58a6ff]/5 focus:border-[#58a6ff] transition-all text-base font-medium"
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowTokenInfo(!showTokenInfo)}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-[#484f58] hover:text-[#58a6ff] transition-colors p-1"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </button>
-                </div>
                 <p className="mt-3 ml-4 max-w-sm flex items-start gap-2 text-[10px] font-mono leading-relaxed text-[#c9d1d9]">
                   <span className="mt-[2px] inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#161b22] border border-[#238636] text-[8px] text-[#39d353]">
                     ✓
                   </span>
                   <span className="px-2 py-1 rounded-full bg-[#161b22] border border-[#238636]/40 text-[#8b949e]">
-                    GitHub tokens are used once in-memory to call the GitHub API and are never stored, logged, or shared.
+                    Only public GitHub data is analyzed. No authentication required.
                   </span>
                 </p>
               </div>
