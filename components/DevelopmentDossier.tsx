@@ -306,90 +306,99 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
           </div>
         </section>
 
-        {/* Activity Grid Section - GitHub Style Contribution Grid */}
+        {/* Monthly Activity Section - Simple 12 Block Row */}
         <section className="mb-24">
-          <h5 className="text-[11px] font-mono text-[#8b949e] uppercase tracking-[0.7em] mb-6 font-black text-center">2025 Public Activity Overview</h5>
+          <h5 className="text-[11px] font-mono text-[#8b949e] uppercase tracking-[0.7em] mb-6 font-black text-center">2025 Monthly Activity</h5>
           
           {/* Disclaimer */}
           <div className="mb-6 text-center">
             <p className="text-[9px] font-mono text-[#6e7681] italic max-w-2xl mx-auto leading-relaxed">
-              Based on publicly available GitHub events. Private contributions and some activity types may not be reflected.
+              ⚠️ Limited to public events from GitHub's API (~90 days). Actual GitHub contribution count may be higher due to private repos and older activity.
             </p>
           </div>
           
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-full max-w-4xl overflow-x-auto">
-              {/* GitHub-style Contribution Grid */}
-              <div className="inline-block min-w-full p-4 bg-[#161b22]/20 rounded-xl">
+          <div className="flex flex-col items-center space-y-6">
+            <div className="w-full max-w-2xl">
+              {/* Simple Monthly Blocks */}
+              <div className="p-4 bg-[#161b22]/20 rounded-xl">
                 {stats.contributionGrid && stats.contributionGrid.length > 0 ? (
-                  <div className="space-y-2">
-                    {/* Month labels */}
-                    <div className="flex justify-between text-[9px] font-mono text-[#8b949e] mb-2 px-2">
-                      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month) => (
-                        <span key={month}>{month}</span>
-                      ))}
-                    </div>
-                    
-                    {/* Contribution squares in a flexible grid */}
-                    <div className="flex flex-wrap gap-1 justify-center max-w-4xl">
-                      {stats.contributionGrid.map((day, i) => {
-                        const getContributionColor = (level: number) => {
+                  <div className="space-y-3">
+                    {/* Single Row of 12 Monthly Blocks - Compact */}
+                    <div className="flex justify-center items-center gap-1 flex-wrap">
+                      {stats.contributionGrid.map((month, i) => {
+                        const getActivityColor = (level: number) => {
                           switch (level) {
-                            case 0: return '#161b22'; // No contributions
-                            case 1: return '#0e4429'; // Low contributions
-                            case 2: return '#006d32'; // Medium-low contributions  
-                            case 3: return '#26a641'; // Medium-high contributions
-                            case 4: return '#39d353'; // High contributions
+                            case 0: return '#161b22'; // No activity
+                            case 1: return '#0e4429'; // Low activity
+                            case 2: return '#006d32'; // Medium-low activity  
+                            case 3: return '#26a641'; // Medium-high activity
+                            case 4: return '#39d353'; // High activity
                             default: return '#161b22';
                           }
                         };
 
                         return (
-                          <div
-                            key={i}
-                            className="w-3 h-3 rounded-sm border border-[#30363d]/30 hover:border-[#30363d] transition-all cursor-pointer group relative"
-                            style={{ backgroundColor: getContributionColor(day.level) }}
-                            title={`${day.count} public contributions on ${day.date}`}
-                          >
-                            {/* Tooltip on hover */}
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#21262d] text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                              {day.count} public contributions on {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          <div key={i} className="group relative">
+                            {/* Monthly Block - Small and Compact */}
+                            <div
+                              className="w-4 h-4 rounded-sm cursor-pointer transition-all hover:scale-110"
+                              style={{ backgroundColor: getActivityColor(month.level) }}
+                              title={`${month.month}: ${month.count} contributions`}
+                            >
+                              {/* Tooltip on hover */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-[#21262d] text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                {month.month}: {month.count} contributions
+                              </div>
                             </div>
                           </div>
                         );
                       })}
                     </div>
+                    
+                    {/* Month Labels Row */}
+                    <div className="flex justify-center items-center gap-1">
+                      {stats.contributionGrid.map((month, i) => (
+                        <div key={i} className="w-4 text-center">
+                          <span className="text-[7px] font-mono text-[#8b949e]">
+                            {month.month.charAt(0)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Legend */}
+                    <div className="flex items-center justify-center mt-4 space-x-2">
+                      <span className="text-[8px] font-mono text-[#8b949e]">Less</span>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#161b22' }}></div>
+                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#0e4429' }}></div>
+                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#006d32' }}></div>
+                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#26a641' }}></div>
+                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#39d353' }}></div>
+                      </div>
+                      <span className="text-[8px] font-mono text-[#8b949e]">More</span>
+                    </div>
                   </div>
                 ) : (
-                  // Fallback message if no contribution grid available
-                  <div className="text-center py-8">
+                  // Fallback message if no activity data available
+                  <div className="text-center py-4">
                     <p className="text-[#8b949e] text-sm font-mono">
-                      Contribution data not available - limited by GitHub's public API
+                      Activity data not available
                     </p>
                   </div>
                 )}
                 
-                {/* Legend */}
-                <div className="flex items-center justify-center mt-4 space-x-2">
-                  <span className="text-[9px] font-mono text-[#8b949e]">Less</span>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#161b22' }}></div>
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#0e4429' }}></div>
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#006d32' }}></div>
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#26a641' }}></div>
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: '#39d353' }}></div>
-                  </div>
-                  <span className="text-[9px] font-mono text-[#8b949e]">More</span>
-                </div>
-                
-                {/* Activity Summary */}
+                {/* Activity Summary with Comparison */}
                 {stats.contributionGrid && (
                   <div className="mt-4 text-center space-y-1">
-                    <p className="text-[10px] font-mono text-[#8b949e]">
-                      {stats.contributionGrid.filter(day => day.count > 0).length} days with public activity in 2025
+                    <p className="text-[9px] font-mono text-[#8b949e]">
+                      {stats.contributionGrid.filter(month => month.count > 0).length} active months • {stats.contributionGrid.reduce((sum, month) => sum + month.count, 0)} detected contributions
                     </p>
-                    <p className="text-[9px] font-mono text-[#6e7681] italic">
-                      Total public contributions: {stats.contributionGrid.reduce((sum, day) => sum + day.count, 0)}
+                    <p className="text-[8px] font-mono text-[#6e7681] opacity-60">
+                      Peak: {stats.contributionGrid.reduce((max, month) => month.count > max.count ? month : max, stats.contributionGrid[0])?.month} ({stats.contributionGrid.reduce((max, month) => Math.max(max, month.count), 0)} contributions)
+                    </p>
+                    <p className="text-[7px] font-mono text-[#ff7b72] opacity-80">
+                      Note: GitHub's official count may be higher due to private activity
                     </p>
                   </div>
                 )}

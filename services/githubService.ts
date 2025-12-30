@@ -105,26 +105,157 @@ const fetchAllRepos = async (username: string): Promise<any[]> => {
 };
 
 /**
+ * Centralized contribution calculation to ensure consistency across all sections
+ */
+const calculateContributionStats = (events: any[], repos: any[]) => {
+  const year2025Start = new Date('2025-01-01');
+  const today = new Date();
+  
+  // Filter events for 2025 only
+  const events2025 = events.filter(event => {
+    const eventDate = new Date(event.created_at);
+    return eventDate >= year2025Start && eventDate <= today;
+  });
+  
+  console.log(`Calculating stats from ${events2025.length} events in 2025`);
+  
+  // Count different types of contributions consistently
+  let totalContributions = 0;
+  const dailyContributions = new Map<string, number>();
+  const monthlyContributions = new Map<string, number>();
+  const activeDaysSet = new Set<string>();
+  
+  events2025.forEach(event => {
+    const eventDate = new Date(event.created_at);
+    const dateStr = eventDate.toISOString().split('T')[0];
+    const monthKey = eventDate.toISOString().slice(0, 7); // YYYY-MM
+    
+    activeDaysSet.add(dateStr);
+    
+    let contributionCount = 0;
+    switch (event.type) {
+      case 'PushEvent':
+        // Count actual commits in push event
+        contributionCount = event.payload?.commits?.length || 1;
+        break;
+      case 'CreateEvent':
+        contributionCount = 1;
+        break;
+      case 'IssuesEvent':
+        contributionCount = 1;
+        break;
+      case 'PullRequestEvent':
+        contributionCount = 1;
+        break;
+      case 'IssueCommentEvent':
+      case 'PullRequestReviewEvent':
+      case 'PullRequestReviewCommentEvent':
+        contributionCount = 1;
+        break;
+      default:
+        contributionCount = 0;
+    }
+    
+    if (contributionCount > 0) {
+      totalContributions += contributionCount;
+      dailyContributions.set(dateStr, (dailyContributions.get(dateStr) || 0) + contributionCount);
+      monthlyContributions.set(monthKey, (monthlyContributions.get(monthKey) || 0) + contributionCount);
+    }
+  });
+  
+  // Add repository activity contributions
+  repos.forEach(repo => {
+    if (repo.updated_at) {
+      const updateDate = new Date(repo.updated_at);
+      if (updateDate >= year2025Start && updateDate <= today) {
+        const dateStr = updateDate.toISOString().split('T')[0];
+        const monthKey = updateDate.toISOString().slice(0, 7);
+        
+        activeDaysSet.add(dateStr);
+        totalContributions += 1;
+        dailyContributions.set(dateStr, (dailyContributions.get(dateStr) || 0) + 1);
+        monthlyContributions.set(monthKey, (monthlyContributions.get(monthKey) || 0) + 1);
+      }
+    }
+  });
+  
+  // Generate monthly activity data
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlyActivity = [];
+  
+  for (let i = 0; i < 12; i++) {
+    const monthKey = `2025-${String(i + 1).padStart(2, '0')}`;
+    const currentMonth = new Date(2025, i, 1);
+    
+    if (currentMonth <= today) {
+      const count = monthlyContributions.get(monthKey) || 0;
+      
+      let level = 0;
+      if (count >= 1) level = 1;
+      if (count >= 5) level = 2;
+      if (count >= 15) level = 3;
+      if (count >= 30) level = 4;
+      
+      monthlyActivity.push({ 
+        month: months[i], 
+        count, 
+        level 
+      });
+    }
+  }
+  
+  return {
+    totalContributions,
+    activeDays: activeDaysSet.size,
+    dailyContributions,
+    monthlyContributions,
+    monthlyActivity,
+    events2025: events2025.length
+  };
+};
+
+/**
  * Try to get more comprehensive activity data by combining multiple sources
+ * and attempting to estimate missing contributions
  */
 const getEnhancedActivityData = async (username: string): Promise<any[]> => {
   try {
-    // Try to get more comprehensive public activity
-    const [publicEvents, publicActivity] = await Promise.all([
+    // Try to get more comprehensive public activity from multiple endpoints
+    const [publicEvents, receivedEvents, userRepos] = await Promise.all([
       fetchViaProxy(`/users/${username}/events/public?per_page=100`, username, 8000),
       // Try to get received events (activity on user's repos)
-      fetchViaProxy(`/users/${username}/received_events/public?per_page=100`, username, 8000).catch(() => [])
+      fetchViaProxy(`/users/${username}/received_events/public?per_page=100`, username, 8000).catch(() => []),
+      // Get user's repositories to estimate additional activity
+      fetchViaProxy(`/users/${username}/repos?per_page=100&sort=updated`, username, 8000).catch(() => [])
     ]);
     
-    console.log(`Enhanced activity: ${publicEvents.length} public events, ${publicActivity.length} received events`);
+    console.log(`Enhanced activity: ${publicEvents.length} public events, ${receivedEvents.length} received events, ${userRepos.length} repos`);
     
     // Combine and deduplicate events
-    const allEvents = [...publicEvents, ...publicActivity];
+    const allEvents = [...publicEvents, ...receivedEvents];
     const uniqueEvents = allEvents.filter((event, index, self) => 
       index === self.findIndex(e => e.id === event.id)
     );
     
-    return uniqueEvents;
+    // Try to estimate additional contributions from repository data
+    const recentRepos = userRepos.filter((repo: any) => {
+      const updatedDate = new Date(repo.updated_at);
+      const year2025Start = new Date('2025-01-01');
+      return updatedDate >= year2025Start;
+    });
+    
+    // Add estimated contributions for repositories updated in 2025
+    // This helps account for activity not captured in events
+    const estimatedRepoContributions = recentRepos.map((repo: any) => ({
+      id: `repo-${repo.id}`,
+      type: 'EstimatedRepoActivity',
+      created_at: repo.updated_at,
+      payload: { estimated: true, repo_name: repo.name }
+    }));
+    
+    console.log(`Added ${estimatedRepoContributions.length} estimated repo contributions`);
+    
+    return [...uniqueEvents, ...estimatedRepoContributions];
   } catch (error) {
     console.warn('Enhanced activity fetch failed, using basic events:', error);
     return [];
@@ -224,8 +355,11 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
       throw new Error('GITHUB_FETCH_TIMEOUT: Data fetching exceeded time limit. Please retry.');
     }
 
-    // Process repos data (can happen while commit search runs)
-    const langMap: Record<string, number> = {};
+    // CENTRALIZED CONTRIBUTION CALCULATION
+    // This ensures all sections show the same numbers
+    const contributionStats = calculateContributionStats(events, repos);
+    
+    console.log('Centralized contribution stats:', contributionStats);
     const recentRepos: GitHubRepo[] = repos.slice(0, 5).map((repo: any) => ({
       name: repo.name,
       url: repo.html_url,
@@ -252,6 +386,8 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
     const currentDate = new Date();
     const accountAge = Math.max(1, Math.floor((currentDate.getTime() - accountCreatedDate.getTime()) / (1000 * 60 * 60 * 24 * 365)));
 
+    // Process repos data for language analysis
+    const langMap: Record<string, number> = {};
     repos.forEach((repo: any) => {
       if (repo.language) {
         langMap[repo.language] = (langMap[repo.language] || 0) + 1;
@@ -282,6 +418,9 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
         commitDates.push(date);
       }
     });
+
+    // Use centralized activity data for streak calculation
+    const activeDaysArray = Array.from(contributionStats.dailyContributions.keys()).sort().reverse();
 
     // Enhanced streak calculation
     let currentStreak = 0;
@@ -393,23 +532,20 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
     );
 
     console.log('Final statistics calculated:', {
-      totalCommits,
-      activeDays: estimatedActiveDays,
+      totalCommits: contributionStats.totalContributions,
+      activeDays: contributionStats.activeDays,
       currentStreak,
       longestStreak,
-      eventsAnalyzed: events.length,
+      eventsAnalyzed: contributionStats.events2025,
       dateRange: `2025-01-01 to ${new Date().toISOString().split('T')[0]}`
     });
-
-    // Generate contribution grid data
-    const contributionGrid = generateContributionGrid(events, repos);
 
     return {
       username: user.login,
       avatarUrl: user.avatar_url,
       profileUrl: user.html_url,
-      totalCommits,
-      activeDays: estimatedActiveDays,
+      totalCommits: contributionStats.totalContributions, // Use centralized calculation
+      activeDays: contributionStats.activeDays, // Use centralized calculation
       topLanguages: topLanguages.length > 0 ? topLanguages : [{ name: 'Unknown', count: 0 }],
       allLanguages: allLanguages.length > 0 ? allLanguages : [{ name: 'Unknown', count: 0 }],
       reposContributed: user.public_repos + (user.total_private_repos || 0),
@@ -419,9 +555,9 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
       longestStreak,
       mostActiveMonth,
       firstActivity: '2025-01-01',
-      lastActivity: Array.from(activeDaysSet).sort().reverse()[0] || new Date().toISOString().split('T')[0],
+      lastActivity: activeDaysArray[0] || new Date().toISOString().split('T')[0],
       activityPattern,
-      contributionGrid,
+      contributionGrid: contributionStats.monthlyActivity, // Use centralized monthly data
       // New fields
       followers: user.followers || 0,
       following: user.following || 0,
@@ -437,102 +573,4 @@ export const fetchGitHubData = async (username: string): Promise<GitHubStats> =>
   }
 };
 
-/**
- * Generate contribution grid data for 2025 based on available public data
- * Note: This is limited to public events and may not match GitHub's full contribution graph
- */
-const generateContributionGrid = (events: any[], repos: any[]): { date: string; count: number; level: number }[] => {
-  const year2025Start = new Date('2025-01-01');
-  const today = new Date();
-  const contributionMap = new Map<string, number>();
-  
-  console.log(`Generating contribution grid from ${events.length} events and ${repos.length} repos`);
-  
-  // Count contributions per day from events (limited by GitHub's public events API)
-  events.forEach(event => {
-    const eventDate = new Date(event.created_at);
-    if (eventDate >= year2025Start && eventDate <= today) {
-      const dateStr = eventDate.toISOString().split('T')[0];
-      
-      // Count different types of contributions more accurately
-      let contributionCount = 0;
-      switch (event.type) {
-        case 'PushEvent':
-          // Count actual commits in push event
-          contributionCount = event.payload?.commits?.length || 1;
-          break;
-        case 'CreateEvent':
-          // Repository or branch creation
-          contributionCount = 1;
-          break;
-        case 'IssuesEvent':
-          // Issue opened/closed
-          contributionCount = 1;
-          break;
-        case 'PullRequestEvent':
-          // PR opened/closed/merged
-          contributionCount = 1;
-          break;
-        case 'IssueCommentEvent':
-        case 'PullRequestReviewEvent':
-        case 'PullRequestReviewCommentEvent':
-          // Comments and reviews
-          contributionCount = 1;
-          break;
-        default:
-          // Other events get minimal contribution
-          contributionCount = 0;
-      }
-      
-      if (contributionCount > 0) {
-        contributionMap.set(dateStr, (contributionMap.get(dateStr) || 0) + contributionCount);
-      }
-    }
-  });
-  
-  // Add estimated contributions for recent repository activity
-  // This helps fill gaps where events API doesn't go back far enough
-  repos.forEach(repo => {
-    if (repo.updated_at) {
-      const updateDate = new Date(repo.updated_at);
-      if (updateDate >= year2025Start && updateDate <= today) {
-        const dateStr = updateDate.toISOString().split('T')[0];
-        // Add minimal contribution for repository updates
-        contributionMap.set(dateStr, (contributionMap.get(dateStr) || 0) + 1);
-      }
-    }
-  });
-  
-  // Generate grid data for all days in 2025 up to today
-  const gridData: { date: string; count: number; level: number }[] = [];
-  const currentDate = new Date(year2025Start);
-  
-  while (currentDate <= today) {
-    const dateStr = currentDate.toISOString().split('T')[0];
-    const count = contributionMap.get(dateStr) || 0;
-    
-    // Calculate level (0-4) based on contribution count
-    // Adjusted thresholds to be more realistic for public data
-    let level = 0;
-    if (count >= 1) level = 1;   // Any activity
-    if (count >= 2) level = 2;   // Light activity
-    if (count >= 4) level = 3;   // Moderate activity  
-    if (count >= 8) level = 4;   // High activity
-    
-    gridData.push({ date: dateStr, count, level });
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  const activeDays = gridData.filter(day => day.count > 0).length;
-  const totalContributions = gridData.reduce((sum, day) => sum + day.count, 0);
-  
-  console.log(`Contribution grid generated:`, {
-    totalDays: gridData.length,
-    activeDays,
-    totalContributions,
-    maxDayContributions: Math.max(...gridData.map(d => d.count)),
-    dataLimitation: 'Based on public events only - may not reflect full GitHub contribution graph'
-  });
-  
-  return gridData;
-};
+
