@@ -104,15 +104,23 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   useEffect(() => {
     const handleResize = () => {
       if (!containerRef.current || !cardRef.current) return;
-      const viewportHeight = window.innerHeight;
-      const containerHeight = viewportHeight * 0.75;
-      const cardHeight = cardRef.current.offsetHeight;
       
-      if (cardHeight > containerHeight) {
-        setScale(containerHeight / cardHeight);
-      } else {
-        setScale(1);
-      }
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const containerPadding = 32; // Account for padding
+      const availableWidth = Math.min(viewportWidth - containerPadding, 480);
+      const availableHeight = viewportHeight * 0.8; // Use 80% of viewport height
+      
+      // Get the natural card dimensions
+      const cardWidth = parseInt(ratioStyles[aspectRatio].width);
+      const cardHeight = parseInt(ratioStyles[aspectRatio].height);
+      
+      // Calculate scale based on both width and height constraints
+      const widthScale = availableWidth / cardWidth;
+      const heightScale = availableHeight / cardHeight;
+      const newScale = Math.min(widthScale, heightScale, 1); // Don't scale up beyond 1
+      
+      setScale(newScale);
     };
 
     window.addEventListener('resize', handleResize);
@@ -226,29 +234,29 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   });
 
   const ratioStyles = {
-    '1:1': { width: '480px', height: '480px' },
-    '4:5': { width: '480px', height: '600px' },
-    '9:16': { width: '420px', height: '746px' },
+    '1:1': { width: '360px', height: '360px' },
+    '4:5': { width: '360px', height: '450px' },
+    '9:16': { width: '320px', height: '568px' },
   };
 
   return (
     <div className="w-full flex flex-col items-center animate-in fade-in duration-1000">
-      <div className="w-full max-w-7xl px-4 flex justify-between items-end mb-6">
+      <div className="w-full max-w-7xl px-2 md:px-4 flex justify-between items-end mb-4 md:mb-6">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-mono font-black text-[#39d353] tracking-[0.4em] uppercase">Status: Artifact_Finalized</span>
-          <h2 className="text-[10px] font-mono font-bold text-white/20 tracking-[0.5em] uppercase">SECURE_TRACE_ID: {traceId}</h2>
+          <span className="text-[9px] md:text-[10px] font-mono font-black text-[#39d353] tracking-[0.3em] md:tracking-[0.4em] uppercase">Status: Artifact_Finalized</span>
+          <h2 className="text-[9px] md:text-[10px] font-mono font-bold text-white/20 tracking-[0.4em] md:tracking-[0.5em] uppercase">SECURE_TRACE_ID: {traceId}</h2>
         </div>
       </div>
       
-      <div className="flex flex-col xl:flex-row gap-8 items-start justify-center w-full max-w-7xl px-4">
+      <div className="flex flex-col xl:flex-row gap-6 md:gap-8 items-start justify-center w-full max-w-7xl px-2 md:px-4">
         
         {/* CARD VIEWER */}
         <div 
           ref={containerRef}
-          className="flex flex-col items-center gap-6 w-full xl:w-auto flex-shrink-0"
+          className="flex flex-col items-center gap-4 md:gap-6 w-full xl:w-auto flex-shrink-0"
         >
           {/* Ratio Selector */}
-          <div className="flex bg-[#161b22]/90 backdrop-blur-2xl p-1.5 rounded-full border border-[#30363d] shadow-2xl z-20">
+          <div className="flex bg-[#161b22]/90 backdrop-blur-2xl p-1 md:p-1.5 rounded-full border border-[#30363d] shadow-2xl z-20">
                {(['1:1', '4:5', '9:16'] as AspectRatio[]).map((r) => (
               <button
                 key={r}
@@ -263,7 +271,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                     });
                   }
                 }}
-                className={`px-4 py-2 rounded-full text-[10px] font-mono uppercase tracking-widest transition-all ${aspectRatio === r ? 'bg-[#39d353] text-black font-black' : 'text-[#8b949e] hover:text-white'}`}
+                className={`px-2 md:px-4 py-1.5 md:py-2 rounded-full text-[9px] md:text-[10px] font-mono uppercase tracking-widest transition-all ${aspectRatio === r ? 'bg-[#39d353] text-black font-black' : 'text-[#8b949e] hover:text-white'}`}
               >
                 {r}
               </button>
@@ -271,18 +279,21 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
           </div>
 
           <div 
-            className="relative flex items-center justify-center transition-all duration-700 ease-in-out"
+            className="relative flex items-center justify-center transition-all duration-700 ease-in-out w-full max-w-sm md:max-w-none"
             style={{ 
-              height: ratioStyles[aspectRatio].height,
-              width: ratioStyles[aspectRatio].width,
-              transform: `scale(${scale})`,
+              height: `${parseInt(ratioStyles[aspectRatio].height) * scale}px`,
+              width: `${parseInt(ratioStyles[aspectRatio].width) * scale}px`,
+              maxWidth: '100vw',
               transformOrigin: 'top center'
             }}
           >
             <div 
               ref={cardRef}
-              className={`absolute inset-0 bg-[#0d1117] rounded-[2rem] p-6 md:p-8 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col`}
-              style={{ ...ratioStyles[aspectRatio] }}
+              className={`absolute inset-0 bg-[#0d1117] rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 lg:p-8 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col`}
+              style={{ 
+                width: ratioStyles[aspectRatio].width,
+                height: ratioStyles[aspectRatio].height
+              }}
             >
               {/* Background GitHub Logos */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -404,8 +415,8 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
         </div>
 
         {/* SIDEBAR ACTIONS & SHARE SYSTEM */}
-        <div className="flex flex-col gap-6 w-full max-w-sm flex-shrink-0 xl:mt-12">
-           <div className="flex flex-col h-full p-8 rounded-[2rem] bg-[#161b22]/40 border border-[#30363d] backdrop-blur-3xl shadow-xl">
+        <div className="flex flex-col gap-4 md:gap-6 w-full max-w-sm flex-shrink-0 xl:mt-12">
+           <div className="flex flex-col h-full p-4 md:p-6 lg:p-8 rounded-[1.5rem] md:rounded-[2rem] bg-[#161b22]/40 border border-[#30363d] backdrop-blur-3xl shadow-xl">
              
              {/* Share Hook Selection */}
              <div className="mb-8 space-y-4">

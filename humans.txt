@@ -1,0 +1,75 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Developer & Designer: Somesh Bhardwaj
+    Contact: hello [at] someshbhardwaj.me
+    Twitter: @someshbhardwaj
+    GitHub: @Dev-Somesh
+    LinkedIn: /in/ersomeshbhardwaj
+    Location: India
+
+# THANKS
+
+    GitHub API for providing comprehensive developer data
+    Google Gemini AI for intelligent insights generation
+    Netlify for reliable hosting and serverless functions
+    The open source community for inspiration and support
+    All developers who use DevWrapped and provide feedback
+
+# TECHNOLOGY COLOPHON
+
+    ## Frontend
+    React 19.2.3
+    TypeScript 5.8.2
+    Tailwind CSS 3.4.19
+    Vite 6.2.0
+    
+    ## AI & APIs
+    Google Gemini AI (Generative Language API)
+    GitHub REST API v4
+    
+    ## Hosting & Infrastructure
+    Netlify (Hosting & Serverless Functions)
+    Netlify Edge Functions
+    
+    ## Analytics & Monitoring
+    Microsoft Clarity
+    
+    ## Development Tools
+    ESM.sh for module imports
+    html-to-image for export functionality
+    
+    ## Design & UX
+    Inter, JetBrains Mono, Space Grotesk fonts
+    GitHub-inspired color palette
+    Mobile-first responsive design
+    
+    ## Performance
+    Client-side processing for privacy
+    Optimized image exports
+    Lazy loading and code splitting
+    
+    ## Security
+    HTTPS-only
+    No data storage
+    Secure API proxy functions
+    Content Security Policy headers
+
+# SITE
+
+    Last update: 2025/12/30
+    Language: English
+    Doctype: HTML5
+    IDE: Visual Studio Code, Kiro AI
+    Version Control: Git
+    Repository: https://github.com/Dev-Somesh/Dev-Wrapped
+    
+# STANDARDS
+
+    Accessibility: WCAG 2.1 AA
+    Performance: Core Web Vitals optimized
+    SEO: Schema.org structured data
+    Privacy: No tracking, no cookies, no data storage
+    Security: Security.txt, CSP headers, HTTPS-only

@@ -1,0 +1,9 @@
+Contact: mailto:hello@someshbhardwaj.me
+Contact: https://github.com/Dev-Somesh/Dev-Wrapped/issues
+Expires: 2026-12-31T23:59:59.000Z
+Encryption: https://keybase.io/someshbhardwaj/pgp_keys.asc
+Preferred-Languages: en
+Canonical: https://devwrapped.netlify.app/.well-known/security.txt
+Policy: https://github.com/Dev-Somesh/Dev-Wrapped/blob/main/SECURITY.md
+Acknowledgments: https://github.com/Dev-Somesh/Dev-Wrapped/blob/main/CONTRIBUTORS.md
+Hiring: https://someshbhardwaj.me/contact
