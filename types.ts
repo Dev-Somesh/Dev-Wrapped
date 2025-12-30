@@ -19,10 +19,12 @@ export interface GitHubStats {
   reposCreatedThisYear: number; // New field for repos created in 2024/2025
   recentRepos: GitHubRepo[];
   streak: number;
+  longestStreak?: number; // New: Longest streak for comparison
   mostActiveMonth: string;
   firstActivity: string;
   lastActivity: string;
   activityPattern: 'burst' | 'consistent' | 'sporadic';
+  contributionGrid?: { date: string; count: number; level: number }[]; // New: Contribution grid data
   // New fields
   followers: number;
   following: number;

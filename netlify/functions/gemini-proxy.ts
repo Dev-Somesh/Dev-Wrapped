@@ -2,20 +2,42 @@ import { Handler } from '@netlify/functions';
 import { GoogleGenAI, Type } from '@google/genai';
 
 export const handler: Handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+      body: '',
+    };
+  }
+
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify({ error: 'Method not allowed' }),
     };
   }
 
   // Get API key from environment variable (set in Netlify)
   const apiKey = process.env.GEMINI_API_KEY;
+  console.log('Gemini proxy: API key present:', !!apiKey);
+  console.log('Gemini proxy: API key length:', apiKey?.length || 0);
+  
   if (!apiKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'GEMINI_API_KEY not configured' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify({ error: 'GEMINI_CONFIG_ERROR: GEMINI_API_KEY is not configured in Netlify environment variables.' }),
     };
   }
 
@@ -91,14 +113,15 @@ export const handler: Handler = async (event, context) => {
       body: response.text,
     };
   } catch (error: any) {
+    console.error('Gemini API Error:', error);
     const errorMessage = error.message || '';
 
     let statusCode = 500;
     let errorResponse = `GEMINI_INTERNAL_ERROR: ${errorMessage || 'Session failed to initialize.'}`;
 
-    if (errorMessage.includes('API_KEY_INVALID') || errorMessage.includes('key')) {
+    if (errorMessage.includes('API_KEY_INVALID') || errorMessage.includes('key') || errorMessage.includes('401')) {
       statusCode = 401;
-      errorResponse = 'GEMINI_AUTH_INVALID: The provided API Key is unauthorized.';
+      errorResponse = 'GEMINI_AUTH_INVALID: The API Key is unauthorized. Please check Netlify environment variables.';
     } else if (errorMessage.includes('429') || errorMessage.includes('QUOTA')) {
       statusCode = 429;
       errorResponse = 'GEMINI_RATE_LIMIT: Model quota exceeded. Please wait a few seconds before retrying.';

@@ -93,6 +93,9 @@ export const handler: Handler = async (event, context) => {
     // Add authorization if token is provided
     if (token) {
       headers['Authorization'] = `token ${token}`;
+      console.log('GitHub proxy: Using token authentication for', endpoint);
+    } else {
+      console.log('GitHub proxy: Using unauthenticated request for', endpoint);
     }
 
     // Create timeout controller
