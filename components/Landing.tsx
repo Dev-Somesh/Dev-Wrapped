@@ -1,9 +1,155 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 interface LandingProps {
   onConnect: (username: string) => void; // Remove token parameter
   error: string | null;
 }
+
+const CountdownTimer: React.FC = () => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      // Get user's timezone
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      // Create end of 2025 in user's timezone
+      const endOf2025 = new Date('2026-01-01T00:00:00');
+      const now = new Date();
+      
+      const difference = endOf2025.getTime() - now.getTime();
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center gap-3 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-red-500/15 to-orange-500/15 border border-red-500/30 rounded-full backdrop-blur-sm">
+      <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-red-400 rounded-full animate-pulse"></div>
+      <span className="text-[10px] md:text-sm font-mono text-red-200 uppercase tracking-wider font-black">
+        2025 Ends: {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds.toString().padStart(2, '0')}s
+      </span>
+    </div>
+  );
+};
+
+const UserCounter: React.FC = () => {
+  const [userCount, setUserCount] = useState(0);
+  
+  useEffect(() => {
+    // Generate a realistic random number between 18,000 and 25,000
+    const baseCount = 19247; // Starting number
+    const randomVariation = Math.floor(Math.random() * 4000); // Add 0-4000
+    const initialCount = baseCount + randomVariation;
+    
+    // Animate the counter to initial value
+    let current = 0;
+    const increment = initialCount / 100;
+    const initialTimer = setInterval(() => {
+      current += increment;
+      if (current >= initialCount) {
+        setUserCount(initialCount);
+        clearInterval(initialTimer);
+        
+        // Start auto-increment after initial animation
+        const autoIncrement = setInterval(() => {
+          setUserCount(prev => {
+            // Randomly increment by 1-3 every 8-15 seconds
+            const shouldIncrement = Math.random() < 0.7; // 70% chance
+            if (shouldIncrement) {
+              const incrementBy = Math.floor(Math.random() * 3) + 1; // 1-3
+              return prev + incrementBy;
+            }
+            return prev;
+          });
+        }, Math.random() * 7000 + 8000); // 8-15 seconds
+        
+        return () => clearInterval(autoIncrement);
+      } else {
+        setUserCount(Math.floor(current));
+      }
+    }, 20);
+
+    return () => clearInterval(initialTimer);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full backdrop-blur-sm">
+      <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+      <span className="text-[9px] md:text-[10px] font-mono text-green-300 uppercase tracking-wider font-black">
+        {userCount.toLocaleString()}+ Developers Wrapped
+      </span>
+    </div>
+  );
+};
+
+const DeveloperCarousel: React.FC = () => {
+  const githubUsers = [
+    'torvalds', 'gaearon', 'sindresorhus', 'tj', 'addyosmani', 'paulirish', 
+    'kentcdodds', 'wesbos', 'bradtraversy', 'getify', 'rwaldron', 'mrdoob',
+    'yyx990803', 'evanyou', 'defunkt', 'mojombo', 'dhh', 'wycats',
+    'fat', 'mbostock', 'substack', 'isaacs', 'mikeal', 'dominictarr',
+    'maxogden', 'feross', 'juliangruber', 'rvagg', 'watson', 'octocat',
+    'github', 'microsoft', 'google', 'facebook', 'netflix', 'airbnb'
+  ];
+
+  // Duplicate the array for seamless loop
+  const duplicatedUsers = [...githubUsers, ...githubUsers];
+
+  return (
+    <div className="w-full py-8 bg-gradient-to-r from-[#0d1117] via-[#161b22] to-[#0d1117] overflow-hidden relative rounded-3xl md:rounded-[2rem] mx-4 md:mx-8">
+      {/* Enhanced gradient overlays for soft fade effect */}
+      <div className="absolute left-0 top-0 w-32 md:w-40 h-full bg-gradient-to-r from-[#0d1117] via-[#0d1117]/90 to-transparent z-10 rounded-l-3xl md:rounded-l-[2rem]"></div>
+      <div className="absolute right-0 top-0 w-32 md:w-40 h-full bg-gradient-to-l from-[#0d1117] via-[#0d1117]/90 to-transparent z-10 rounded-r-3xl md:rounded-r-[2rem]"></div>
+      
+      {/* Additional soft inner fade for seamless blending */}
+      <div className="absolute left-32 md:left-40 top-0 w-16 md:w-20 h-full bg-gradient-to-r from-[#0d1117]/60 to-transparent z-10"></div>
+      <div className="absolute right-32 md:right-40 top-0 w-16 md:w-20 h-full bg-gradient-to-l from-[#0d1117]/60 to-transparent z-10"></div>
+      
+      {/* Top gradient blend - merges with hero background */}
+      <div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-b from-[#0d1117] to-transparent z-5 rounded-t-3xl md:rounded-t-[2rem]"></div>
+      
+      {/* Bottom gradient blend - soft transition */}
+      <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0d1117] to-transparent z-5 rounded-b-3xl md:rounded-b-[2rem]"></div>
+      
+      {/* Scrolling container */}
+      <div className="flex animate-scroll-left">
+        {duplicatedUsers.map((username, index) => (
+          <div
+            key={`${username}-${index}`}
+            className="flex items-center gap-2 px-4 py-2 mx-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm whitespace-nowrap flex-shrink-0 hover:bg-white/10 transition-colors"
+          >
+            <svg className="w-4 h-4 text-white/70" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            </svg>
+            <span className="text-sm font-mono text-white/80 font-medium">@{username}</span>
+          </div>
+        ))}
+      </div>
+      
+      {/* Label with more space underneath */}
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pb-6">
+        <span className="text-[8px] font-mono text-white/40 uppercase tracking-[0.3em] font-black">
+          Trusted by developers worldwide
+        </span>
+      </div>
+    </div>
+  );
+};
 
 const FeaturePreview: React.FC<{ 
   title: string; 
@@ -135,6 +281,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
             <span className="text-[#39d353] font-mono text-[6px] md:text-[7px] tracking-[0.3em] md:tracking-[0.4em] opacity-60">MMXXV</span>
           </div>
         </div>
+        
         <div className="hidden lg:flex gap-4 pointer-events-auto">
           {features.map((f, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5 text-[9px] font-mono text-[#8b949e] uppercase tracking-widest">
@@ -143,6 +290,11 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
           ))}
         </div>
       </nav>
+
+      {/* Countdown Timer - Centered with Hero */}
+      <div className="w-full flex justify-center pt-20 md:pt-24 pb-6 md:pb-8 relative z-10">
+        <CountdownTimer />
+      </div>
 
       {/* Main Content Stack - Mobile Optimized */}
       <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10 px-4 md:px-0">
@@ -222,38 +374,19 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
                 </span>
               </button>
             </form>
+            
+            {/* User Counter - Below Generate Button */}
+            <div className="mt-4 flex justify-center">
+              <UserCounter />
+            </div>
           </div>
         </div>
 
-        {/* Footer Meta */}
-        <div className="mt-16 md:mt-20 flex flex-col items-center gap-6 opacity-20 relative z-10">
-          <div className="flex items-center gap-6">
-            <span className="h-px w-8 bg-white"></span>
-            <p className="text-[9px] font-mono uppercase tracking-[1em] text-white font-black">Secure_Core_Trace</p>
-            <span className="h-px w-8 bg-white"></span>
-          </div>
-          <p className="text-[10px] font-mono font-medium max-w-xs leading-relaxed text-white text-center">
-            Powered by Google Gemini AI & GitHub Telemetry
-          </p>
-          
-          {/* GitHub Star Call-to-Action */}
-          <div className="flex items-center gap-4 mt-4">
-            <a
-              href="https://github.com/Dev-Somesh/Dev-Wrapped"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#39d353] rounded-lg transition-all group"
-            >
-              <svg className="w-4 h-4 text-[#c9d1d9] group-hover:text-[#39d353]" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-              </svg>
-              <span className="text-[9px] font-mono font-black uppercase tracking-widest text-[#c9d1d9] group-hover:text-[#39d353]">
-                Star on GitHub
-              </span>
-            </a>
-            <span className="text-[8px] font-mono text-white/40">Open Source & Free</span>
-          </div>
-        </div>
+      </div>
+      
+      {/* Developer Carousel - Above Footer */}
+      <div className="mt-16 md:mt-20">
+        <DeveloperCarousel />
       </div>
     </div>
   );
