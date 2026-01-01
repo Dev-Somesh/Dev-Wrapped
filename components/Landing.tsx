@@ -5,43 +5,56 @@ interface LandingProps {
   error: string | null;
 }
 
-const CountdownTimer: React.FC = () => {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+const YearBanner: React.FC = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      // Get user's timezone
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
-      // Create end of 2025 in user's timezone
-      const endOf2025 = new Date('2026-01-01T00:00:00');
-      const now = new Date();
-      
-      const difference = endOf2025.getTime() - now.getTime();
-
-      if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
-
-        setTimeLeft({ days, hours, minutes, seconds });
-      } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
     return () => clearInterval(timer);
   }, []);
 
+  // Calculate days since January 1, 2026
+  const startOf2026 = new Date('2026-01-01T00:00:00');
+  const startOf2027 = new Date('2027-01-01T00:00:00');
+  
+  const daysSince2026Start = Math.floor((currentTime.getTime() - startOf2026.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Check if we're in 2026 or later
+  const isIn2026 = currentTime < startOf2027;
+  const currentYear = currentTime.getFullYear();
+  const currentMonth = currentTime.getMonth() + 1; // 1-based month
+  
+  let displayText = '';
+  
+  if (isIn2026) {
+    // Special New Year messaging for January
+    if (currentMonth === 1) {
+      if (daysSince2026Start === 1) {
+        displayText = `🎉 Happy New Year! Day 1 of 2026 • Perfect time to review 2025!`;
+      } else if (daysSince2026Start <= 7) {
+        displayText = `🎊 New Year Week! Day ${daysSince2026Start} of 2026 • Reflect on your 2025 journey`;
+      } else if (daysSince2026Start <= 31) {
+        displayText = `✨ New Year Vibes! Day ${daysSince2026Start} of 2026 • Celebrate your 2025 achievements`;
+      }
+    } else {
+      // Regular messaging for rest of the year
+      displayText = `Day ${daysSince2026Start} of 2026 • Keep building your legacy`;
+    }
+  } else {
+    // We're in 2027 or later
+    const currentYearStart = new Date(`${currentYear}-01-01T00:00:00`);
+    const daysSinceYearStart = Math.floor((currentTime.getTime() - currentYearStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    displayText = `Day ${daysSinceYearStart} of ${currentYear} • Your development journey evolves`;
+  }
+
   return (
-    <div className="flex items-center justify-center gap-3 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-red-500/15 to-orange-500/15 border border-red-500/30 rounded-full backdrop-blur-sm">
-      <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-red-400 rounded-full animate-pulse"></div>
-      <span className="text-[10px] md:text-sm font-mono text-red-200 uppercase tracking-wider font-black">
-        2025 Ends: {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds.toString().padStart(2, '0')}s
+    <div className="flex items-center justify-center gap-3 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-green-500/15 to-blue-500/15 border border-green-500/30 rounded-full backdrop-blur-sm">
+      <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+      <span className="text-[10px] md:text-sm font-mono text-green-200 uppercase tracking-wider font-black">
+        {displayText}
       </span>
     </div>
   );
@@ -205,7 +218,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
         content={
           <div className="space-y-2">
             <p className="text-sm font-light italic leading-relaxed opacity-80">
-              "2025 was a masterclass in consistency. You didn't just push code; you built a practice..."
+              "This year was a masterclass in consistency. You didn't just push code; you built a practice..."
             </p>
             <div className="flex gap-1 pt-2">
               <div className="h-1 w-12 bg-[#bc8cff]/30 rounded-full"></div>
@@ -278,7 +291,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-white font-black text-[10px] md:text-xs tracking-tighter uppercase">DevWrapped</span>
-            <span className="text-[#39d353] font-mono text-[6px] md:text-[7px] tracking-[0.3em] md:tracking-[0.4em] opacity-60">MMXXV</span>
+            <span className="text-[#39d353] font-mono text-[6px] md:text-[7px] tracking-[0.3em] md:tracking-[0.4em] opacity-60">ANNUAL</span>
           </div>
         </div>
         
@@ -291,9 +304,9 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
         </div>
       </nav>
 
-      {/* Countdown Timer - Centered with Hero */}
+      {/* Year Banner - Centered with Hero */}
       <div className="w-full flex justify-center pt-20 md:pt-24 pb-6 md:pb-8 relative z-10">
-        <CountdownTimer />
+        <YearBanner />
       </div>
 
       {/* Main Content Stack - Mobile Optimized */}
@@ -306,14 +319,13 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[7.5rem] font-display font-black tracking-tighter text-[#f0f6fc] leading-[0.8] md:leading-[0.75] select-none">
-            CELEBRATE<br />YOUR<br />
+            CELEBRATE<br />YOUR 2025<br />
             <span className="animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-[#39d353] via-[#58a6ff] to-[#bc8cff] drop-shadow-[0_0_40px_rgba(57,211,83,0.15)]">
               CODE JOURNEY.
             </span>
           </h1>
           <p className="text-[#8b949e] text-base md:text-lg lg:text-xl font-light italic max-w-sm md:max-w-lg mx-auto leading-relaxed opacity-70 px-4 md:px-0">
-            Relive your 2025 coding milestones through a cinematic lens.
-            One commit at a time.
+            New Year, New Reflections. Celebrate your incredible 2025 coding achievements with a beautiful year-in-review.
           </p>
         </div>
 

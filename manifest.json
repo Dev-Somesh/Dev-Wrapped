@@ -1,6 +1,6 @@
 {
-  "name": "DevWrapped 2025 - AI-Powered GitHub Year in Review",
-  "short_name": "DevWrapped 2025",
+  "name": "DevWrapped - AI-Powered GitHub Year in Review",
+  "short_name": "DevWrapped",
   "description": "AI-powered GitHub analytics tool that transforms your coding activity into beautiful year-in-review visualizations with personalized developer insights and archetype analysis.",
   "start_url": "/",
   "display": "standalone",
@@ -17,7 +17,7 @@
       "sizes": "1200x630",
       "type": "image/png",
       "platform": "wide",
-      "label": "DevWrapped 2025 Dashboard"
+      "label": "DevWrapped Dashboard"
     }
   ],
   "icons": [

@@ -183,7 +183,7 @@ const App: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-[#39d353] font-black uppercase tracking-widest text-sm">DevWrapped 2025</h3>
+                  <h3 className="text-[#39d353] font-black uppercase tracking-widest text-sm">DevWrapped</h3>
                   <p className="text-[#8b949e] text-xs font-mono">AI-Powered GitHub Year in Review</p>
                 </div>
               </div>
@@ -288,7 +288,7 @@ const App: React.FC = () => {
                   LinkedIn
                 </a>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out DevWrapped 2025!')}&url=${encodeURIComponent('https://devwrapped.netlify.app')}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out DevWrapped - AI-powered GitHub year in review!')}&url=${encodeURIComponent('https://devwrapped.netlify.app')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors text-sm"
@@ -356,7 +356,7 @@ const App: React.FC = () => {
           {/* Bottom Section - Copyright & Status */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-4 text-[#8b949e]">
-              <span>© 2025 Somesh Bhardwaj</span>
+              <span>© {new Date().getFullYear()} Somesh Bhardwaj</span>
               <span className="opacity-40">•</span>
               <span className="flex items-center gap-1">
                 Made with <span className="text-[#ff7b72]">❤️</span> for developers
