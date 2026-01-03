@@ -38,10 +38,21 @@ export interface GitHubStats {
 export interface AIInsights {
   archetype: string;
   archetypeDescription: string;
+  archetypeExplanation: {
+    reasoning: string[];
+    keyFactors: { factor: string; evidence: string }[];
+    confidence: number;
+  };
   narrative: string;
   cardInsight: string; // One-line human-centric insight for the share card
   insights: string[];
   patterns: string[];
+  forwardLooking: {
+    recommendations: string[];
+    risks: string[];
+    opportunities: string[];
+  };
+  executiveSummary: string; // TL;DR for the dossier
 }
 
 export enum Step {

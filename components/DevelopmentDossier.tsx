@@ -11,6 +11,20 @@ interface DevelopmentDossierProps {
 const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights }) => {
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    narrative: false,
+    insights: false,
+    patterns: false,
+    forward: false,
+    technical: false
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   // Enhanced highlighting function for narratives with user data
   const highlightText = (text: string) => {

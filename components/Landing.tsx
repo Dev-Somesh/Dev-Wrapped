@@ -327,6 +327,31 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
           <p className="text-[#8b949e] text-base md:text-lg lg:text-xl font-light italic max-w-sm md:max-w-lg mx-auto leading-relaxed opacity-70 px-4 md:px-0">
             New Year, New Reflections. Celebrate your incredible 2025 coding achievements with a beautiful year-in-review.
           </p>
+          
+          {/* Use Cases - NEW */}
+          <div className="mt-8 md:mt-12 max-w-2xl mx-auto">
+            <p className="text-[9px] md:text-[10px] font-mono text-[#39d353] uppercase tracking-[0.4em] font-black mb-4 text-center">
+              Perfect For
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {[
+                { icon: "💼", text: "Job Applications" },
+                { icon: "📁", text: "Portfolio Content" },
+                { icon: "🚀", text: "Founder Stories" },
+                { icon: "📈", text: "Hiring Signals" }
+              ].map((useCase, i) => (
+                <div key={i} className="flex flex-col items-center gap-2 p-3 md:p-4 bg-white/5 rounded-xl border border-white/10 hover:border-[#39d353]/30 transition-all group">
+                  <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">{useCase.icon}</span>
+                  <span className="text-[10px] md:text-[11px] font-mono text-[#c9d1d9] text-center font-medium tracking-wide">
+                    {useCase.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] md:text-[11px] font-mono text-[#8b949e] text-center mt-4 italic">
+              Use this in your portfolio, job applications, or founder story
+            </p>
+          </div>
         </div>
 
         {/* Action Card - Mobile Optimized */}

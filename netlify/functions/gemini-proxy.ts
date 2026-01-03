@@ -54,7 +54,7 @@ export const handler: Handler = async (event, context) => {
     const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
-    Analyze this developer's 2024-2025 GitHub activity. Create a cinematic "Year Wrapped" narrative.
+    Analyze this developer's 2024-2025 GitHub activity. Create a comprehensive "Year Wrapped" analysis with explainable insights and forward-looking guidance.
     
     DEVELOPER TELEMETRY:
     - User: ${stats.username}
@@ -64,22 +64,44 @@ export const handler: Handler = async (event, context) => {
     - Scope: ${stats.reposContributed} repositories
     - Momentum: ${stats.streak} day streak
     - Seasonality: Peak work in ${stats.mostActiveMonth}
+    - Activity Pattern: ${stats.activityPattern}
+    - Account Age: ${stats.accountAge} years
+    - Social: ${stats.followers} followers, ${stats.following} following
     
     OUTPUT SCHEMA (JSON ONLY):
-    1. archetype: A bold developer persona.
-    2. archetypeDescription: A poetic 1-sentence definition.
-    3. insights: 3 specific behavioral traces from their code activity.
-    4. patterns: 2 high-level development rhythms detected.
-    5. narrative: A well-formatted 3-paragraph story with line breaks. Include specific numbers like ${stats.totalCommits} contributions, ${stats.activeDays} active days, ${stats.streak} day streak, and mention ${stats.topLanguages[0]?.name || 'their primary language'}. Format with proper paragraph breaks using \\n\\n between paragraphs.
-    6. cardInsight: A punchy 10-word quote for social sharing.
+    1. archetype: A bold developer persona (e.g., "The Architect", "The Explorer", "The Craftsperson")
+    2. archetypeDescription: A poetic 1-sentence definition
+    3. archetypeExplanation: {
+       reasoning: [3 specific reasons why they got this archetype],
+       keyFactors: [3 objects with {factor: "High repo breadth", evidence: "Contributed to ${stats.reposContributed} repositories"}],
+       confidence: number between 0.7-1.0
+    }
+    4. executiveSummary: A 2-sentence TL;DR of their year
+    5. insights: 3 specific behavioral traces from their code activity
+    6. patterns: 2 high-level development rhythms detected
+    7. narrative: A well-formatted 3-paragraph story with line breaks using \\n\\n
+    8. cardInsight: A punchy 10-word quote for social sharing
+    9. forwardLooking: {
+       recommendations: [3 actionable suggestions for next year],
+       risks: [2 potential burnout/growth risks to watch],
+       opportunities: [2 growth opportunities based on their patterns]
+    }
     
-    FORMATTING REQUIREMENTS for narrative:
-    - Use \\n\\n to separate paragraphs
-    - Include specific data points: @${stats.username}, ${stats.totalCommits} contributions, ${stats.activeDays} days, ${stats.streak} streak
-    - Mention primary language: ${stats.topLanguages[0]?.name || 'JavaScript'}
-    - Make it personal and engaging
+    ARCHETYPE EXAMPLES & LOGIC:
+    - "The Architect": High repo breadth + consistent patterns + complex languages
+    - "The Explorer": Many languages + diverse projects + experimental commits
+    - "The Craftsperson": Deep focus + quality over quantity + refined stack
+    - "The Collaborator": High social metrics + team-oriented repos + consistent activity
+    - "The Innovator": New repos created + cutting-edge stack + burst patterns
+    - "The Maintainer": Long streaks + steady patterns + established projects
     
-    TONE: Professional, sophisticated, narrative-first with data integration.
+    FORWARD-LOOKING GUIDANCE RULES:
+    - Base recommendations on their actual patterns
+    - Identify realistic risks (burnout, skill gaps, isolation)
+    - Suggest concrete opportunities (new technologies, collaboration, specialization)
+    - Keep advice actionable and specific to their profile
+    
+    TONE: Professional, insightful, data-driven but human. Make the archetype explanation feel earned and trustworthy.
   `;
 
     const response = await ai.models.generateContent({
@@ -92,12 +114,38 @@ export const handler: Handler = async (event, context) => {
           properties: {
             archetype: { type: Type.STRING },
             archetypeDescription: { type: Type.STRING },
+            archetypeExplanation: {
+              type: Type.OBJECT,
+              properties: {
+                reasoning: { type: Type.ARRAY, items: { type: Type.STRING } },
+                keyFactors: { 
+                  type: Type.ARRAY, 
+                  items: { 
+                    type: Type.OBJECT,
+                    properties: {
+                      factor: { type: Type.STRING },
+                      evidence: { type: Type.STRING }
+                    }
+                  }
+                },
+                confidence: { type: Type.NUMBER }
+              }
+            },
+            executiveSummary: { type: Type.STRING },
             insights: { type: Type.ARRAY, items: { type: Type.STRING } },
             patterns: { type: Type.ARRAY, items: { type: Type.STRING } },
             narrative: { type: Type.STRING },
             cardInsight: { type: Type.STRING },
+            forwardLooking: {
+              type: Type.OBJECT,
+              properties: {
+                recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+                risks: { type: Type.ARRAY, items: { type: Type.STRING } },
+                opportunities: { type: Type.ARRAY, items: { type: Type.STRING } }
+              }
+            }
           },
-          required: ['archetype', 'archetypeDescription', 'insights', 'patterns', 'narrative', 'cardInsight'],
+          required: ['archetype', 'archetypeDescription', 'archetypeExplanation', 'executiveSummary', 'insights', 'patterns', 'narrative', 'cardInsight', 'forwardLooking'],
         },
       },
     });
