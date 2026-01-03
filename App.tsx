@@ -1,9 +1,10 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Step, GitHubStats, AIInsights } from './types';
 import { fetchGitHubData } from './services/githubService';
 import { generateAIWrapped } from './services/geminiService';
 import { logDiagnosticData } from './services/security';
+import { trackEvent, identifyUser } from './services/mixpanelService';
 import Landing from './components/Landing';
 import Loading from './components/Loading';
 // Intermediate step components removed for streamlined flow
@@ -64,9 +65,32 @@ const App: React.FC = () => {
   const [activeModel] = useState("gemini-3-flash-preview");
   const [showCredits, setShowCredits] = useState(false);
 
+  // Track page view on app load
+  useEffect(() => {
+    trackEvent('Page View', {
+      page_url: window.location.href,
+      page_title: document.title,
+      user_agent: navigator.userAgent
+    });
+  }, []);
+
   const startAnalysis = async (user: string) => {
     setStep(Step.Analysis);
     setError(null);
+    
+    // Track Launch AI event
+    trackEvent('Launch AI', {
+      user_id: user,
+      page_url: window.location.href,
+      page_title: document.title
+    });
+
+    // Identify user for Mixpanel
+    identifyUser(user, {
+      '$name': user,
+      'platform': 'GitHub',
+      'analysis_date': new Date().toISOString()
+    });
     
     // Track analysis start
     if (typeof window !== 'undefined' && (window as any).clarity) {
@@ -81,6 +105,24 @@ const App: React.FC = () => {
       
       const fetchedInsights = await generateAIWrapped(fetchedStats, activeModel);
       setInsights(fetchedInsights);
+
+      // Track AI Response Sent
+      trackEvent('AI Response Sent', {
+        user_id: user,
+        archetype: fetchedInsights.archetype,
+        total_commits: fetchedStats.totalCommits,
+        active_days: fetchedStats.activeDays,
+        streak: fetchedStats.streak,
+        top_language: fetchedStats.topLanguages[0]?.name || 'Unknown',
+        model_used: activeModel
+      });
+
+      // Track Conversion Event (successful analysis completion)
+      trackEvent('Conversion Event', {
+        user_id: user,
+        conversion_type: 'GitHub Analysis Completed',
+        archetype: fetchedInsights.archetype
+      });
       
       // Skip intermediate steps and go directly to Share page
       setTimeout(() => {
@@ -99,6 +141,26 @@ const App: React.FC = () => {
         }
       }, 3500);
     } catch (err: any) {
+      // Track API Error
+      trackEvent('API Error', {
+        user_id: user,
+        error_type: err.message?.includes('AUTH') ? 'Authentication' : 
+                   err.message?.includes('RATE_LIMIT') ? 'Rate Limit' : 
+                   err.message?.includes('CONFIG_ERROR') ? 'Configuration' : 'Unknown',
+        error_message: err.message || 'Unknown error',
+        page_url: window.location.href,
+        model_used: activeModel
+      });
+
+      // Track general Error event
+      trackEvent('Error', {
+        error_type: 'API',
+        error_message: err.message || 'Analysis failed',
+        error_code: err.status || 'unknown',
+        page_url: window.location.href,
+        user_id: user
+      });
+
       // Detailed Diagnostic Logging
       logDiagnosticData(err, { username: user, step: Step[step], model: activeModel });
       
@@ -124,6 +186,12 @@ const App: React.FC = () => {
     // From Share page, go back to Entry to restart
     if (step === Step.Share) {
       setStep(Step.Entry);
+      
+      // Track restart action
+      trackEvent('Analysis Restarted', {
+        previous_username: stats?.username || 'unknown',
+        page_url: window.location.href
+      });
       
       // Track restart action
       if (typeof window !== 'undefined' && (window as any).clarity) {

@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { GitHubStats, AIInsights } from '../types';
 import { generateSecureTraceId } from '../services/security';
+import { trackEvent } from '../services/mixpanelService';
 
 interface ShareCardProps {
   stats: GitHubStats;
@@ -43,6 +44,15 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
 
   // Track page view when component mounts
   useEffect(() => {
+    // Track share card view with Mixpanel
+    trackEvent('Share Card Viewed', {
+      user_id: stats.username,
+      archetype: insights.archetype,
+      total_commits: stats.totalCommits,
+      active_days: stats.activeDays,
+      page_url: window.location.href
+    });
+
     if (typeof window !== 'undefined' && (window as any).clarity) {
       (window as any).clarity('event', 'share_card_viewed', {
         username: stats.username,
@@ -132,6 +142,13 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
     if (!cardRef.current) return;
     setIsExporting(true);
     
+    // Track export attempt with Mixpanel
+    trackEvent('Share Card Export Started', {
+      user_id: stats.username,
+      archetype: insights.archetype,
+      page_url: window.location.href
+    });
+    
     // Track export attempt with Microsoft Clarity
     if (typeof window !== 'undefined' && (window as any).clarity) {
       (window as any).clarity('event', 'share_card_export_started', {
@@ -160,6 +177,13 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       link.href = dataUrl;
       link.click();
       
+      // Track successful export with Mixpanel
+      trackEvent('Share Card Export Success', {
+        user_id: stats.username,
+        archetype: insights.archetype,
+        page_url: window.location.href
+      });
+      
       // Track successful export
       if (typeof window !== 'undefined' && (window as any).clarity) {
         (window as any).clarity('event', 'share_card_export_success', {
@@ -169,6 +193,14 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       }
     } catch (err) {
       console.error('Export failed:', err);
+      
+      // Track export failure with Mixpanel
+      trackEvent('Error', {
+        error_type: 'Export',
+        error_message: err instanceof Error ? err.message : 'Unknown error',
+        page_url: window.location.href,
+        user_id: stats.username
+      });
       
       // Track export failure
       if (typeof window !== 'undefined' && (window as any).clarity) {
@@ -323,6 +355,29 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                  <p className={`text-[13px] md:text-[14px] text-[#8b949e] font-light leading-relaxed tracking-wide opacity-90 italic`}>
                    {insights.archetypeDescription}
                  </p>
+                 
+                 {/* Why This Archetype */}
+                 <div className="mt-4 pt-3 border-t border-white/10">
+                   <h4 className="text-[9px] font-mono text-[#39d353] uppercase tracking-[0.3em] font-black mb-2">Why This Archetype</h4>
+                   <div className="space-y-1">
+                     <div className="flex items-start gap-2">
+                       <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.reposContributed} repositories → Cross-domain architectural breadth</span>
+                     </div>
+                     <div className="flex items-start gap-2">
+                       <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">Multi-language stack ({stats.topLanguages.slice(0, 2).map(l => l.name).join(' + ')}) → Versatility</span>
+                     </div>
+                     <div className="flex items-start gap-2">
+                       <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.activeDays} active days across 2025 → Consistent execution</span>
+                     </div>
+                     <div className="flex items-start gap-2">
+                       <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.mostActiveMonth} activity peak → Seasonal delivery pattern</span>
+                     </div>
+                   </div>
+                 </div>
               </div>
 
               {/* Stats Grid */}
@@ -406,6 +461,15 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                  <button 
                   onClick={() => {
                     setActiveHook((activeHook + 1) % hooks.length);
+                    
+                    // Track hook cycling with Mixpanel
+                    trackEvent('Share Hook Cycled', {
+                      user_id: stats.username,
+                      new_hook_type: hooks[(activeHook + 1) % hooks.length].type,
+                      current_hook_type: hooks[activeHook].type,
+                      page_url: window.location.href
+                    });
+                    
                     // Track hook cycling
                     if (typeof window !== 'undefined' && (window as any).clarity) {
                       (window as any).clarity('event', 'share_hook_cycled', {
@@ -445,6 +509,15 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    const personalizedText = `${hooks[activeHook].text}\n\n🎬 Just got my DevWrapped 2025 results!\n\nArchetype: ${insights.archetype}\n"${insights.archetypeDescription}"\n\n2025 Highlights:\n• ${stats.totalCommits} contributions across ${stats.activeDays} active days\n• ${stats.streak} day longest streak\n• Top languages: ${stats.topLanguages.map(l => l.name).join(', ')}\n\nThe AI insights were surprisingly accurate! Try yours at https://devwrapped.netlify.app\n\n#DevWrapped2025 #YearInCode #GitHub #DeveloperStory`;
                    navigator.clipboard.writeText(personalizedText);
                    
+                   // Track text copy with Mixpanel
+                   trackEvent('Personalized Text Copied', {
+                     user_id: stats.username,
+                     archetype: insights.archetype,
+                     hook_type: hooks[activeHook].type,
+                     text_length: personalizedText.length,
+                     page_url: window.location.href
+                   });
+                   
                    // Track text copy with Microsoft Clarity
                    if (typeof window !== 'undefined' && (window as any).clarity) {
                      (window as any).clarity('event', 'personalized_text_copied', {
@@ -477,6 +550,14 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    target="_blank"
                    rel="noreferrer"
                    onClick={() => {
+                     // Track LinkedIn click with Mixpanel
+                     trackEvent('Social Platform Opened', {
+                       platform: 'linkedin',
+                       user_id: stats.username,
+                       archetype: insights.archetype,
+                       page_url: window.location.href
+                     });
+                     
                      // Track LinkedIn click
                      if (typeof window !== 'undefined' && (window as any).clarity) {
                        (window as any).clarity('event', 'social_platform_opened', {
@@ -500,6 +581,14 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    target="_blank"
                    rel="noreferrer"
                    onClick={() => {
+                     // Track Twitter/X click with Mixpanel
+                     trackEvent('Social Platform Opened', {
+                       platform: 'twitter',
+                       user_id: stats.username,
+                       archetype: insights.archetype,
+                       page_url: window.location.href
+                     });
+                     
                      // Track Twitter/X click
                      if (typeof window !== 'undefined' && (window as any).clarity) {
                        (window as any).clarity('event', 'social_platform_opened', {

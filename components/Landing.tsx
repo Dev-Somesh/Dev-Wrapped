@@ -349,7 +349,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
               ))}
             </div>
             <p className="text-[10px] md:text-[11px] font-mono text-[#8b949e] text-center mt-4 italic">
-              Use this in your portfolio, job applications, or founder story
+              Use this artifact in portfolios, interviews, and founder stories.
             </p>
           </div>
         </div>

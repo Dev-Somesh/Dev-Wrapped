@@ -50,6 +50,7 @@
    ```bash
    # Create .env file with your API keys
    GEMINI_API_KEY=your_gemini_api_key_here
+   VITE_MIXPANEL_TOKEN=your_mixpanel_token_here
    ```
 
 3. **Development**
@@ -74,6 +75,7 @@ For comprehensive documentation including architecture, deployment, API referenc
 - **Frontend**: React 19, TypeScript, Tailwind CSS
 - **AI Engine**: Google Gemini (Flash/Lite models)
 - **Backend**: Netlify Functions (Serverless)
+- **Analytics**: Mixpanel (Privacy-first user insights)
 - **Build**: Vite
 - **Deployment**: Netlify
 
@@ -84,7 +86,7 @@ For comprehensive documentation including architecture, deployment, API referenc
 - **Public Data Only**: Uses only publicly available GitHub information
 - **Secure API Keys**: Server-side storage only, never exposed to clients
 - **No Authentication Required**: Works without GitHub login or tokens
-- **No Tracking**: No analytics, cookies, or user identification
+- **Privacy-First Analytics**: Anonymous usage tracking with Mixpanel for product improvement
 - **HTTPS Only**: All communications encrypted and secure
 
 ## 🌟 Features

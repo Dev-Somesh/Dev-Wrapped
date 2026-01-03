@@ -126,6 +126,7 @@ graph TD
    
    # Add your API keys
    echo "GEMINI_API_KEY=your_gemini_api_key_here" >> .env
+   echo "VITE_MIXPANEL_TOKEN=your_mixpanel_token_here" >> .env
    ```
 
 4. **Development Server**
@@ -149,6 +150,12 @@ graph TD
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Create a new API key
 3. Add to your `.env` file as `GEMINI_API_KEY`
+
+#### Mixpanel Analytics Token
+1. Visit [Mixpanel](https://mixpanel.com) and create an account
+2. Create a new project
+3. Copy your project token
+4. Add to your `.env` file as `VITE_MIXPANEL_TOKEN`
 
 **Note**: GitHub API access is public-only and doesn't require authentication.
 
@@ -233,6 +240,52 @@ DevWrapped 2025 is fully optimized for mobile devices with comprehensive respons
 
 ---
 
+## 📊 Analytics & Privacy
+
+### 🔍 User Analytics with Mixpanel
+
+DevWrapped 2025 uses **Mixpanel** for user experience analytics to improve the product while maintaining privacy:
+
+#### **What We Track**
+- **Page Views**: App usage and navigation patterns
+- **Feature Usage**: Which features are most popular
+- **AI Interactions**: Launch AI, analysis completion, export actions
+- **Error Tracking**: Technical issues for debugging
+- **Social Sharing**: Platform preferences and sharing patterns
+
+#### **What We DON'T Track**
+- **Personal Data**: No emails, names, or sensitive information
+- **GitHub Content**: No code, commit messages, or repository content
+- **Browsing History**: No tracking outside the app
+- **Cross-Site Tracking**: No cookies or persistent identifiers
+
+#### **Privacy-First Approach**
+- **Anonymous Analytics**: User identification by GitHub username only
+- **No Data Retention**: Analytics data used for insights, not storage
+- **Opt-Out Friendly**: Respects Do Not Track headers
+- **Transparent**: All tracking events are documented
+
+#### **Tracked Events**
+```typescript
+// Core user journey
+'Page View'              // App loads
+'Launch AI'              // Analysis starts
+'AI Response Sent'       // Analysis completes
+'Conversion Event'       // Successful analysis
+
+// Feature interactions
+'Share Card Viewed'      // Results page viewed
+'Share Card Export'      // Image download
+'Social Platform Opened' // Social sharing
+'Personalized Text Copied' // Text sharing
+
+// Error monitoring
+'Error'                  // General errors
+'API Error'              // API failures
+```
+
+---
+
 ## 🔧 Configuration
 
 ### 🌍 Environment Variables
@@ -240,6 +293,9 @@ DevWrapped 2025 is fully optimized for mobile devices with comprehensive respons
 ```bash
 # Required
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Analytics (Required for production)
+VITE_MIXPANEL_TOKEN=your_mixpanel_token_here
 
 # Optional (for development)
 GITHUB_TOKEN=your_github_token_here  # Not used in production

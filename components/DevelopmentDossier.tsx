@@ -183,6 +183,33 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
           </div>
         </div>
 
+        {/* Executive Summary */}
+        <section className="mb-24 relative z-10">
+          <h5 className="text-[11px] font-mono text-[#58a6ff] uppercase tracking-[0.7em] mb-10 font-black">Executive Summary</h5>
+          <div className="bg-[#161b22]/30 border border-[#30363d] p-8 md:p-12 rounded-[3rem]">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
+                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+                  Operates in focused, high-intensity development cycles with {stats.activeDays} active days
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
+                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+                  Demonstrates system-level thinking across {stats.reposContributed} repositories
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
+                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+                  Delivers peak output during {stats.mostActiveMonth} with sustained {stats.streak}-day streaks
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Section I */}
         <section className="mb-24 relative z-10">
           <h5 className="text-[11px] font-mono text-[#39d353] uppercase tracking-[0.7em] mb-10 font-black">Section I // The Narrative</h5>
@@ -227,6 +254,50 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
             </div>
           </section>
         </div>
+
+        {/* Strategic Outlook */}
+        <section className="mb-24 relative z-10">
+          <h5 className="text-[11px] font-mono text-[#ff7b72] uppercase tracking-[0.7em] mb-10 font-black">Strategic Outlook</h5>
+          <div className="bg-[#161b22]/30 border border-[#30363d] p-8 md:p-12 rounded-[3rem]">
+            <div className="space-y-8">
+              <div className="flex gap-6">
+                <span className="text-[#ff7b72] font-mono text-[14px] font-black">1.</span>
+                <div>
+                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                    <span className="font-semibold">Sustainability Signal</span>
+                  </p>
+                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                    Sprint-heavy execution with {stats.activeDays} active days suggests high throughput but may indicate need for sustainable pacing cycles.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-6">
+                <span className="text-[#ff7b72] font-mono text-[14px] font-black">2.</span>
+                <div>
+                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                    <span className="font-semibold">Growth Opportunity</span>
+                  </p>
+                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                    Strong {stats.topLanguages[0]?.name || 'technical'} dominance suggests readiness for deeper system ownership or platform leadership roles.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-6">
+                <span className="text-[#ff7b72] font-mono text-[14px] font-black">3.</span>
+                <div>
+                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                    <span className="font-semibold">Collaboration Vector</span>
+                  </p>
+                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                    Multi-repo orchestration across {stats.reposContributed} repositories indicates high solo throughput; next leverage may come from visible team leadership.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Section IV - Mobile Optimized */}
         <section className="mb-16 md:mb-24 px-2 md:px-0">
