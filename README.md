@@ -145,6 +145,16 @@ For comprehensive documentation including architecture, deployment, API referenc
 
 ---
 
+## 📈 Repository Traffic
+
+Traffic (views/clones) is archived daily via [GitHub Actions](.github/workflows/traffic_archive.yml) to bypass the 14-day API limit. The chart below updates automatically after each run.
+
+![Traffic Chart](./traffic_chart.png)
+
+*Chart appears after the first workflow run. GitHub may cache the image for a few minutes after updates.*
+
+---
+
 ## ◈ SUPPORT & FEEDBACK
 - **Complete Documentation**: [DOCUMENTATION.md](./DOCUMENTATION.md)
 - **Issues & Bugs**: GitHub Issues
