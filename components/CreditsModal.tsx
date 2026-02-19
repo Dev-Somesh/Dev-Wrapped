@@ -93,17 +93,19 @@ const CreditsModal: React.FC<CreditsModalProps> = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" style={{ paddingLeft: 'max(1rem, env(safe-area-inset-left))', paddingRight: 'max(1rem, env(safe-area-inset-right))', paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       <div className="bg-[#0d1117] border border-[#30363d] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-[#0d1117] border-b border-[#30363d] p-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-display font-black text-white">Credits & Acknowledgments</h2>
-            <p className="text-[#8b949e] text-sm mt-1">Gratitude to the technologies and services that make DevWrapped possible</p>
+        <div className="sticky top-0 bg-[#0d1117] border-b border-[#30363d] p-4 sm:p-6 flex items-start sm:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl sm:text-2xl font-display font-black text-white">Credits & Acknowledgments</h2>
+            <p className="text-[#8b949e] text-xs sm:text-sm mt-1">Gratitude to the technologies and services that make DevWrapped possible</p>
           </div>
           <button
+            type="button"
+            aria-label="Close"
             onClick={onClose}
-            className="text-[#8b949e] hover:text-white transition-colors p-2 hover:bg-[#21262d] rounded-lg"
+            className="touch-target flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#8b949e] hover:text-white transition-colors p-3 hover:bg-[#21262d] rounded-xl"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>

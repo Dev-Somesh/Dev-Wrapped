@@ -5,6 +5,7 @@ import { calculateYearAvailability, getYearDisplayInfo } from '../utils/dateUtil
 interface LandingProps {
   onConnect: (username: string, selectedYear?: number) => void;
   error: string | null;
+  onOpenCredits?: () => void;
 }
 
 const YearBanner: React.FC = () => {
@@ -53,9 +54,9 @@ const YearBanner: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center justify-center gap-3 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-green-500/15 to-blue-500/15 border border-green-500/30 rounded-full backdrop-blur-sm">
-      <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-      <span className="text-[10px] md:text-sm font-mono text-green-200 uppercase tracking-wider font-black">
+    <div className="flex items-center justify-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-green-500/15 to-blue-500/15 border border-green-500/30 rounded-full backdrop-blur-sm max-w-[95vw] sm:max-w-md md:max-w-none">
+      <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-400 rounded-full animate-pulse flex-shrink-0"></div>
+      <span className="text-[9px] sm:text-[10px] md:text-sm font-mono text-green-200 uppercase tracking-wider font-black text-center leading-tight">
         {displayText}
       </span>
     </div>
@@ -122,45 +123,31 @@ const DeveloperCarousel: React.FC = () => {
     'github', 'microsoft', 'google', 'facebook', 'netflix', 'airbnb'
   ];
 
-  // Duplicate the array for seamless loop
   const duplicatedUsers = [...githubUsers, ...githubUsers];
 
   return (
-    <div className="w-full py-8 bg-gradient-to-r from-[#0d1117] via-[#161b22] to-[#0d1117] overflow-hidden relative rounded-3xl md:rounded-[2rem] mx-4 md:mx-8">
-      {/* Enhanced gradient overlays for soft fade effect */}
-      <div className="absolute left-0 top-0 w-32 md:w-40 h-full bg-gradient-to-r from-[#0d1117] via-[#0d1117]/90 to-transparent z-10 rounded-l-3xl md:rounded-l-[2rem]"></div>
-      <div className="absolute right-0 top-0 w-32 md:w-40 h-full bg-gradient-to-l from-[#0d1117] via-[#0d1117]/90 to-transparent z-10 rounded-r-3xl md:rounded-r-[2rem]"></div>
-      
-      {/* Additional soft inner fade for seamless blending */}
-      <div className="absolute left-32 md:left-40 top-0 w-16 md:w-20 h-full bg-gradient-to-r from-[#0d1117]/60 to-transparent z-10"></div>
-      <div className="absolute right-32 md:right-40 top-0 w-16 md:w-20 h-full bg-gradient-to-l from-[#0d1117]/60 to-transparent z-10"></div>
-      
-      {/* Top gradient blend - merges with hero background */}
-      <div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-b from-[#0d1117] to-transparent z-5 rounded-t-3xl md:rounded-t-[2rem]"></div>
-      
-      {/* Bottom gradient blend - soft transition */}
-      <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0d1117] to-transparent z-5 rounded-b-3xl md:rounded-b-[2rem]"></div>
-      
-      {/* Scrolling container */}
-      <div className="flex animate-scroll-left">
-        {duplicatedUsers.map((username, index) => (
-          <div
-            key={`${username}-${index}`}
-            className="flex items-center gap-2 px-4 py-2 mx-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm whitespace-nowrap flex-shrink-0 hover:bg-white/10 transition-colors"
-          >
-            <svg className="w-4 h-4 text-white/70" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-            </svg>
-            <span className="text-sm font-mono text-white/80 font-medium">@{username}</span>
-          </div>
-        ))}
-      </div>
-      
-      {/* Label with more space underneath */}
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20 pb-6">
-        <span className="text-[8px] font-mono text-white/40 uppercase tracking-[0.3em] font-black">
+    <div className="w-full overflow-hidden relative rounded-xl sm:rounded-2xl md:rounded-[2rem] mx-0 md:mx-6">
+      <div className="relative z-20 pt-3 pb-2 sm:pt-4 sm:pb-3 md:pt-5 md:pb-4 text-center">
+        <span className="text-[7px] sm:text-[8px] md:text-[9px] font-mono text-white/40 uppercase tracking-[0.2em] sm:tracking-[0.3em] md:tracking-[0.4em] font-black">
           Trusted by developers worldwide
         </span>
+      </div>
+      <div className="relative py-3 sm:py-4 md:py-6 bg-gradient-to-r from-[#0d1117] via-[#161b22] to-[#0d1117] rounded-b-xl sm:rounded-b-2xl md:rounded-b-[2rem]">
+        <div className="absolute left-0 top-0 w-16 sm:w-24 md:w-40 h-full bg-gradient-to-r from-[#0d1117] via-[#0d1117]/95 to-transparent z-10 rounded-bl-xl md:rounded-bl-[2rem]"></div>
+        <div className="absolute right-0 top-0 w-16 sm:w-24 md:w-40 h-full bg-gradient-to-l from-[#0d1117] via-[#0d1117]/95 to-transparent z-10 rounded-br-xl md:rounded-br-[2rem]"></div>
+        <div className="flex animate-scroll-left">
+          {duplicatedUsers.map((username, index) => (
+            <div
+              key={`${username}-${index}`}
+              className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 px-2.5 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-2.5 mx-1.5 sm:mx-2 md:mx-2.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm whitespace-nowrap flex-shrink-0 hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 text-white/70 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+              </svg>
+              <span className="text-[10px] sm:text-xs md:text-sm font-mono text-white/80 font-medium">@{username}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -191,9 +178,10 @@ const FeaturePreview: React.FC<{
   </div>
 );
 
-const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
+const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) => {
   const [username, setUsername] = useState('');
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   
   // Calculate year availability based on current date
   const yearAvailability = useMemo(() => calculateYearAvailability(), []);
@@ -228,7 +216,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
   ];
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center px-6 py-20 animate-in fade-in duration-1000 relative overflow-hidden">
+    <div className="w-full min-h-screen flex flex-col items-center px-2 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 md:justify-center animate-in fade-in duration-1000 relative overflow-x-hidden">
       
       {/* 1. THE NARRATIVE (Top Left) */}
       <FeaturePreview 
@@ -303,90 +291,140 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
         }
       />
 
-      {/* Top Branding - Mobile Optimized */}
-      <nav className="fixed top-0 left-0 w-full p-4 md:p-8 flex justify-between items-center pointer-events-none z-50">
-        <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-          <div className="w-6 h-6 md:w-8 md:h-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg flex items-center justify-center shadow-2xl">
-            <svg height="14" width="14" className="md:w-[18px] md:h-[18px]" viewBox="0 0 16 16" fill="white">
+      {/* Top Branding - Compact logo + menu */}
+      <nav className="fixed top-0 left-0 w-full pl-4 pr-3 py-2.5 sm:pl-5 sm:pr-4 sm:py-3 md:pl-6 md:pr-6 flex justify-between items-center pointer-events-none z-50 safe-x" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingLeft: 'max(1rem, env(safe-area-inset-left))' }}>
+        <a href="/" className="flex items-center gap-2 pointer-events-auto rounded-lg hover:bg-white/5 transition-colors p-1 pl-2 sm:pl-3" aria-label="DevWrapped home">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-md flex items-center justify-center flex-shrink-0">
+            <svg height="14" width="14" className="sm:w-4 sm:h-4" viewBox="0 0 16 16" fill="white">
               <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
             </svg>
           </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-white font-black text-[10px] md:text-xs tracking-tighter uppercase">DevWrapped</span>
-            <span className="text-[#39d353] font-mono text-[6px] md:text-[7px] tracking-[0.3em] md:tracking-[0.4em] opacity-60">ANNUAL</span>
-          </div>
-        </div>
+          <span className="text-white font-black text-xs sm:text-sm tracking-tight uppercase">DevWrapped</span>
+          <span className="text-[#39d353] font-mono text-[9px] tracking-widest opacity-80 hidden sm:inline">ANNUAL</span>
+        </a>
         
-        <div className="hidden lg:flex gap-4 pointer-events-auto">
+        <div className="hidden lg:flex gap-2 pointer-events-auto">
           {features.map((f, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5 text-[9px] font-mono text-[#8b949e] uppercase tracking-widest">
+            <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 rounded-full border border-white/5 text-[8px] font-mono text-[#8b949e] uppercase tracking-wider">
               <span className="text-[#39d353]">{f.icon}</span> {f.title}
             </div>
           ))}
         </div>
+
+        <div className="lg:hidden flex items-center pointer-events-auto">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="touch-target p-2.5 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
       </nav>
 
-      {/* Year Banner - Centered with Hero */}
-      <div className="w-full flex justify-center pt-20 md:pt-24 pb-6 md:pb-8 relative z-10">
+      {/* Mobile nav drawer - compact */}
+      {mobileNavOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden" aria-hidden onClick={() => setMobileNavOpen(false)} />
+          <div className="fixed top-0 right-0 h-full w-full max-w-[280px] bg-[#0d1117] border-l border-[#30363d] shadow-2xl z-[70] flex flex-col safe-y p-3 pt-[max(0.5rem,env(safe-area-inset-top))] animate-slide-in-right lg:hidden">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[#39d353] font-mono text-[10px] uppercase tracking-widest font-black">Menu</span>
+              <button type="button" aria-label="Close menu" onClick={() => setMobileNavOpen(false)} className="touch-target p-2 rounded-lg text-[#8b949e] hover:text-white hover:bg-white/10">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-col gap-1">
+              {features.map((f, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-xs font-mono text-[#8b949e]">
+                  <span className="text-[#39d353]">{f.icon}</span> {f.title}
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/10 space-y-1">
+              <a href="https://github.com/Dev-Somesh/Dev-Wrapped" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-xs font-mono text-[#c9d1d9] min-h-[44px]">
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+                Star on GitHub
+              </a>
+              <a href="https://github.com/sponsors/Dev-Somesh" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 text-xs font-mono text-pink-400 min-h-[44px]">
+                Sponsor
+              </a>
+              <button
+                type="button"
+                onClick={() => { setMobileNavOpen(false); onOpenCredits?.(); }}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-[#8b949e] hover:text-[#bc8cff] text-left w-full min-h-[44px] text-xs font-mono"
+              >
+                Credits
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Year Banner - compact */}
+      <div className="w-full flex justify-center pt-12 sm:pt-16 md:pt-24 pb-3 sm:pb-4 md:pb-8 relative z-10">
         <YearBanner />
       </div>
 
-      {/* Main Content Stack - Mobile Optimized */}
-      <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10 px-4 md:px-0">
+      {/* Main Content Stack - compact hero, full width on mobile */}
+      <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10">
         
-        <div className="mb-12 md:mb-16 space-y-4 md:space-y-6">
-          <div className="inline-block px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-2">
-            <span className="text-[#8b949e] font-mono text-[8px] md:text-[9px] uppercase tracking-[0.4em] md:tracking-[0.5em] font-black">
+        <div className="mb-5 sm:mb-8 md:mb-12 lg:mb-16 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6">
+          <div className="inline-block px-2.5 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-0.5 md:mb-2">
+            <span className="text-[#8b949e] font-mono text-[8px] sm:text-[9px] md:text-[9px] uppercase tracking-[0.25em] sm:tracking-[0.4em] md:tracking-[0.5em] font-black">
               Engineering Year-in-Review
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[7.5rem] font-display font-black tracking-tighter text-[#f0f6fc] leading-[0.8] md:leading-[0.75] select-none">
+          <h1 className="text-[1.5rem] leading-[1.08] sm:text-2xl sm:leading-[1.05] md:text-5xl md:leading-[0.9] lg:text-6xl xl:text-[4.5rem] 2xl:text-[7.5rem] 2xl:leading-[0.75] font-display font-black tracking-tighter text-[#f0f6fc] select-none">
             CELEBRATE<br />YOUR 2025<br />
             <span className="animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-[#39d353] via-[#58a6ff] to-[#bc8cff] drop-shadow-[0_0_40px_rgba(57,211,83,0.15)]">
               CODE JOURNEY.
             </span>
           </h1>
-          <p className="text-[#8b949e] text-base md:text-lg lg:text-xl font-light italic max-w-sm md:max-w-lg mx-auto leading-relaxed opacity-70 px-4 md:px-0">
+          <p className="text-[#8b949e] text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-light italic max-w-sm md:max-w-lg mx-auto leading-snug md:leading-relaxed opacity-70 px-0 sm:px-2">
             New Year, New Reflections. Celebrate your incredible 2025 coding achievements with a beautiful year-in-review.
           </p>
           
-          {/* Use Cases - NEW */}
-          <div className="mt-8 md:mt-12 max-w-2xl mx-auto">
-            <p className="text-[9px] md:text-[10px] font-mono text-[#39d353] uppercase tracking-[0.4em] font-black mb-4 text-center">
+          <div className="mt-4 sm:mt-6 md:mt-10 lg:mt-12 max-w-2xl mx-auto">
+            <p className="text-[9px] md:text-[10px] lg:text-xs font-mono text-[#39d353] uppercase tracking-wider font-black mb-2 md:mb-4 text-center">
               Perfect For
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
               {[
                 { icon: "💼", text: "Job Applications" },
                 { icon: "📁", text: "Portfolio Content" },
                 { icon: "🚀", text: "Founder Stories" },
                 { icon: "📈", text: "Hiring Signals" }
               ].map((useCase, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 p-3 md:p-4 bg-white/5 rounded-xl border border-white/10 hover:border-[#39d353]/30 transition-all group">
-                  <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">{useCase.icon}</span>
-                  <span className="text-[10px] md:text-[11px] font-mono text-[#c9d1d9] text-center font-medium tracking-wide">
+                <div key={i} className="flex flex-col items-center gap-1 sm:gap-1.5 md:gap-2 p-2 sm:p-3 md:p-4 lg:p-5 bg-white/5 rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10 hover:border-[#39d353]/30 transition-all group min-h-0">
+                  <span className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl group-hover:scale-110 transition-transform">{useCase.icon}</span>
+                  <span className="text-[10px] sm:text-[11px] md:text-xs font-mono text-[#c9d1d9] text-center font-medium leading-tight">
                     {useCase.text}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] md:text-[11px] font-mono text-[#8b949e] text-center mt-4 italic">
+            <p className="text-[9px] md:text-[10px] lg:text-xs font-mono text-[#8b949e] text-center mt-2 md:mt-4 italic">
               Use this artifact in portfolios, interviews, and founder stories.
             </p>
           </div>
         </div>
 
-        {/* Action Card - Mobile Optimized */}
-        <div className="w-full max-w-sm md:max-w-md relative group">
-          <div className="absolute -inset-1 bg-gradient-to-br from-[#39d353]/20 to-[#58a6ff]/20 rounded-2xl md:rounded-[3rem] blur-2xl opacity-40 group-hover:opacity-70 transition duration-1000"></div>
+        {/* Entry form - compact on mobile, full size on desktop */}
+        <div className="w-full max-w-[320px] sm:max-w-sm md:max-w-md relative group mt-0">
+          <div className="absolute -inset-0.5 sm:-inset-1 md:-inset-1.5 bg-gradient-to-br from-[#39d353]/20 to-[#58a6ff]/20 rounded-xl md:rounded-[2rem] lg:rounded-[3rem] blur-xl md:blur-2xl opacity-40 group-hover:opacity-70 transition duration-1000"></div>
           
-          <div className="relative bg-[#161b22]/80 backdrop-blur-3xl border border-[#30363d] p-6 md:p-8 lg:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl">
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-              <div className="space-y-3 text-left">
-                <label className="text-[9px] md:text-[10px] font-mono text-[#484f58] uppercase tracking-[0.2em] md:tracking-[0.3em] ml-3 md:ml-4 font-black">Initialization Profile</label>
+          <div className="relative bg-[#161b22]/80 backdrop-blur-3xl border border-[#30363d] p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 rounded-xl md:rounded-[2rem] lg:rounded-[3rem] shadow-2xl">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 lg:space-y-6">
+              <div className="space-y-2 md:space-y-3 text-left">
+                <label className="text-[8px] md:text-[10px] lg:text-xs font-mono text-[#484f58] uppercase tracking-wider md:tracking-[0.2em] ml-2 md:ml-4 font-black">Initialization Profile</label>
                 <div className="relative group/input">
-                  <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-[#484f58] group-focus-within/input:text-[#39d353] transition-colors">
-                    <svg width="16" height="16" className="md:w-[18px] md:h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                  <div className="absolute left-3 md:left-5 lg:left-6 top-1/2 -translate-y-1/2 text-[#484f58] group-focus-within/input:text-[#39d353] transition-colors">
+                    <svg width="14" height="14" className="md:w-[18px] md:h-[18px] lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
                   </div>
                   <input
                     type="text"
@@ -400,24 +438,19 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
                     }}
                     placeholder="GitHub Username"
                     required
-                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl md:rounded-2xl pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-5 text-[#f0f6fc] placeholder:text-[#484f58] focus:outline-none focus:ring-4 focus:ring-[#39d353]/5 focus:border-[#39d353] transition-all text-base md:text-lg font-medium"
+                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg md:rounded-xl lg:rounded-2xl pl-9 md:pl-14 lg:pl-16 pr-3 md:pr-5 py-3 md:py-4 lg:py-5 text-[#f0f6fc] placeholder:text-[#484f58] focus:outline-none focus:ring-2 md:focus:ring-4 focus:ring-[#39d353]/5 focus:border-[#39d353] transition-all text-sm md:text-base lg:text-lg font-medium"
                   />
                 </div>
-                <p className="mt-3 ml-3 md:ml-4 max-w-sm flex items-start gap-2 text-[9px] md:text-[10px] font-mono leading-relaxed text-[#c9d1d9]">
-                  <span className="mt-[2px] inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#161b22] border border-[#238636] text-[8px] text-[#39d353]">
-                    ✓
-                  </span>
-                  <span className="px-2 py-1 rounded-full bg-[#161b22] border border-[#238636]/40 text-[#8b949e]">
-                    Only public GitHub data is analyzed. No authentication required.
-                  </span>
+                <p className="mt-2 ml-2 md:ml-4 flex items-start gap-1.5 text-[8px] md:text-[9px] lg:text-[10px] font-mono leading-snug text-[#c9d1d9]">
+                  <span className="mt-[1px] inline-flex h-2.5 w-2.5 md:h-3 md:w-3 items-center justify-center rounded-full bg-[#161b22] border border-[#238636] text-[7px] md:text-[8px] text-[#39d353] flex-shrink-0">✓</span>
+                  <span className="rounded bg-[#161b22] border border-[#238636]/40 text-[#8b949e] px-1.5 py-0.5 md:px-2 md:py-1">Public data only. No auth required.</span>
                 </p>
               </div>
 
-              {/* Year Selection - Only show if multiple years available */}
               {yearAvailability.canShowYearSelection && (
-                <div className="space-y-3 text-left">
-                  <label className="text-[9px] md:text-[10px] font-mono text-[#484f58] uppercase tracking-[0.2em] md:tracking-[0.3em] ml-3 md:ml-4 font-black">Analysis Year</label>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2 md:space-y-3 text-left">
+                  <label className="text-[8px] md:text-[10px] lg:text-xs font-mono text-[#484f58] uppercase tracking-wider ml-2 md:ml-4 font-black">Analysis Year</label>
+                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
                     {yearAvailability.availableYears.map((year) => {
                       const yearInfo = getYearDisplayInfo(year);
                       return (
@@ -433,14 +466,14 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
                               page_url: window.location.href
                             });
                           }}
-                          className={`p-3 rounded-xl border transition-all text-left ${
+                          className={`p-2.5 md:p-3 lg:p-4 rounded-lg md:rounded-xl border transition-all text-left ${
                             selectedYear === year
                               ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]'
                               : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:border-[#39d353]/50'
                           }`}
                         >
-                          <div className="font-bold text-sm">{year}</div>
-                          <div className="text-[10px] opacity-70 mt-1">
+                          <div className="font-bold text-xs md:text-sm">{year}</div>
+                          <div className="text-[9px] md:text-[10px] opacity-70 mt-0.5 md:mt-1">
                             {yearInfo.dataQuality === 'partial' && '📊 Partial data'}
                             {yearInfo.dataQuality === 'mixed' && '🔀 Mixed data'}
                             {yearInfo.dataQuality === 'full' && '✅ Full data'}
@@ -449,56 +482,52 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
                       );
                     })}
                   </div>
-                  <p className="mt-2 ml-3 md:ml-4 text-[8px] md:text-[9px] font-mono text-[#6e7681] leading-relaxed">
+                  <p className="mt-1 ml-2 md:ml-4 text-[7px] md:text-[8px] lg:text-[9px] font-mono text-[#6e7681] leading-snug">
                     ⚠️ {yearAvailability.dataLimitation}
                   </p>
                 </div>
               )}
 
-              {/* Data Limitation Warning - Always show */}
               {yearAvailability.canShowCurrentYearOnly && (
-                <div className="space-y-2 text-left">
-                  <div className="p-3 rounded-xl bg-[#d29922]/10 border border-[#d29922]/20 text-[#d29922]">
-                    <div className="flex items-center gap-2 text-xs font-bold">
+                <div className="space-y-1 md:space-y-2 text-left">
+                  <div className="p-2.5 md:p-3 lg:p-4 rounded-lg md:rounded-xl bg-[#d29922]/10 border border-[#d29922]/20 text-[#d29922]">
+                    <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold">
                       <span>⚠️</span>
                       <span>Data Limitation Notice</span>
                     </div>
-                    <p className="text-[10px] mt-1 opacity-80">
-                      {yearAvailability.dataLimitation}
-                    </p>
+                    <p className="text-[9px] md:text-[10px] mt-0.5 md:mt-1 opacity-80">{yearAvailability.dataLimitation}</p>
                   </div>
                 </div>
               )}
 
               {error && (
-                <div className="p-4 rounded-xl bg-red-900/10 border border-red-500/20 text-red-400 text-xs animate-shake flex flex-col gap-2">
-                   <div className="flex items-center gap-3">
-                     <span className="font-black">!</span>
-                     <p className="font-medium">{error}</p>
-                   </div>
-                   <div className="pt-2 border-t border-red-500/10 text-[10px] opacity-70">
-                     Technical failure? Report to <a href="mailto:hello@someshbhardwaj.me" className="underline font-bold">hello@someshbhardwaj.me</a>
-                   </div>
+                <div className="p-3 md:p-4 rounded-lg md:rounded-xl bg-red-900/10 border border-red-500/20 text-red-400 text-[10px] md:text-xs animate-shake flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-black">!</span>
+                    <p className="font-medium">{error}</p>
+                  </div>
+                  <p className="pt-1 border-t border-red-500/10 text-[9px] md:text-[10px] opacity-70">
+                    Report to <a href="mailto:hello@someshbhardwaj.me" className="underline font-bold">hello@someshbhardwaj.me</a>
+                  </p>
                 </div>
               )}
 
               <button
                 type="submit"
-                className="group relative w-full bg-[#238636] hover:bg-[#2ea043] text-white font-black py-4 md:py-6 rounded-xl md:rounded-2xl transition-all shadow-xl active:scale-[0.98] overflow-hidden"
+                className="group relative w-full bg-[#238636] hover:bg-[#2ea043] text-white font-black py-3 md:py-4 lg:py-5 xl:py-6 rounded-lg md:rounded-xl lg:rounded-2xl transition-all shadow-lg md:shadow-xl active:scale-[0.98] overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <span className="relative flex items-center justify-center gap-2 md:gap-3 text-base md:text-xl tracking-tighter">
+                <span className="relative flex items-center justify-center gap-2 md:gap-3 text-sm md:text-base lg:text-lg xl:text-xl tracking-tighter">
                   <span className="hidden sm:inline">GENERATE WRAPPED</span>
                   <span className="sm:hidden">GENERATE</span>
-                  <svg className="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:translate-x-1" viewBox="0 0 16 16" fill="currentColor">
+                  <svg className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 transition-transform group-hover:translate-x-1" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5Z"></path>
                   </svg>
                 </span>
               </button>
             </form>
             
-            {/* User Counter - Below Generate Button */}
-            <div className="mt-4 flex justify-center">
+            <div className="mt-3 md:mt-4 flex justify-center">
               <UserCounter />
             </div>
           </div>
@@ -506,8 +535,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error }) => {
 
       </div>
       
-      {/* Developer Carousel - Above Footer */}
-      <div className="mt-16 md:mt-20">
+      <div className="mt-6 sm:mt-10 md:mt-20 w-full">
         <DeveloperCarousel />
       </div>
     </div>

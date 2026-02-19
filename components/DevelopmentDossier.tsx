@@ -119,7 +119,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
   };
 
   return (
-    <div className="w-full max-w-5xl mt-12 md:mt-24 mb-16 md:mb-32 animate-in fade-in duration-1000 px-4 md:px-0">
+    <div className="w-full max-w-5xl mt-12 md:mt-24 mb-16 md:mb-32 animate-in fade-in duration-1000 px-4 md:px-0" style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6 md:gap-0">
         <div className="space-y-2 text-center md:text-left w-full md:w-auto">
           <h3 className="text-2xl md:text-4xl font-display font-black text-white tracking-tighter uppercase">Intelligence Dossier</h3>

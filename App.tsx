@@ -253,7 +253,7 @@ const App: React.FC = () => {
 
   const renderStep = () => {
     switch (step) {
-      case Step.Entry: return <Landing onConnect={startAnalysis} error={error} />;
+      case Step.Entry: return <Landing onConnect={startAnalysis} error={error} onOpenCredits={() => setShowCredits(true)} />;
       case Step.Analysis: return <Loading />;
       // Intermediate steps skipped for streamlined user experience
       // case Step.Stats: return stats && <StatsSlide stats={stats} onNext={nextStep} onBack={prevStep} />;
@@ -262,56 +262,47 @@ const App: React.FC = () => {
       // case Step.Narrative: return insights && <NarrativeSummary insights={insights} onNext={nextStep} onBack={prevStep} />;
       // case Step.Archetype: return insights && <ArchetypeReveal insights={insights} onNext={nextStep} onBack={prevStep} />;
       case Step.Share: return stats && insights && (
-        <div className="w-full flex flex-col items-center pt-12 pb-24 no-scrollbar">
+        <div className="w-full flex flex-col items-center pt-8 sm:pt-12 pb-24 no-scrollbar safe-x" style={{ paddingBottom: 'max(6rem, calc(1.5rem + env(safe-area-inset-bottom)))' }}>
           <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />
           <DevelopmentDossier stats={stats} insights={insights} />
         </div>
       );
-      default: return <Landing onConnect={startAnalysis} error={error} />;
+      default: return <Landing onConnect={startAnalysis} error={error} onOpenCredits={() => setShowCredits(true)} />;
     }
   };
 
   return (
-    <div className={`min-h-screen bg-[#0d1117] text-[#c9d1d9] flex flex-col relative transition-colors duration-1000 ${step === Step.Share ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+    <div className={`min-h-screen bg-[#0d1117] text-[#c9d1d9] flex flex-col relative transition-colors duration-1000 ${step === Step.Analysis ? 'overflow-hidden' : 'overflow-y-auto'}`}>
       <BackgroundIcons />
 
-      <main className="flex-1 w-full max-w-5xl px-6 mx-auto z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] relative">
+      <main className={`flex-1 w-full max-w-5xl mx-auto z-10 flex flex-col items-center min-h-[calc(100vh-80px)] relative main-content-padding ${step === Step.Entry ? 'justify-start' : 'justify-center'}`}>
         {renderStep()}
       </main>
 
-      <footer className="w-full py-8 md:py-12 px-4 md:px-6 border-t border-white/5 bg-[#0d1117]/80 backdrop-blur-xl relative z-50">
-        {/* Secure Core Trace Divider - Blurred */}
-        <div className="flex items-center justify-center gap-6 mb-8 opacity-10 blur-sm">
-          <span className="h-px w-12 bg-white/30"></span>
-          <p className="text-[9px] font-mono uppercase tracking-[1em] text-white/30 font-black">Secure_Core_Trace</p>
-          <span className="h-px w-12 bg-white/30"></span>
+      <footer className="w-full py-5 md:py-6 px-4 md:px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/5 bg-[#0d1117]/80 backdrop-blur-xl relative z-50">
+        {/* Compact divider */}
+        <div className="flex items-center justify-center gap-3 mb-4 opacity-20">
+          <span className="h-px w-8 bg-white/30"></span>
+          <span className="text-[8px] font-mono uppercase tracking-widest text-white/30">Secure_Core_Trace</span>
+          <span className="h-px w-8 bg-white/30"></span>
         </div>
 
-        {/* Main Footer Content */}
         <div className="max-w-6xl mx-auto">
-          {/* Top Section - Project Info & Actions */}
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-8">
-            {/* Left - Project Branding */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg flex items-center justify-center">
-                  <svg height="18" width="18" viewBox="0 0 16 16" fill="white">
-                    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-[#39d353] font-black uppercase tracking-widest text-sm">DevWrapped</h3>
-                  <p className="text-[#8b949e] text-xs font-mono">AI-Powered GitHub Year in Review</p>
-                </div>
+          {/* Top: Brand + Actions in one row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-2 text-center sm:text-left">
+              <div className="w-7 h-7 bg-white/5 border border-white/10 rounded-md flex items-center justify-center flex-shrink-0">
+                <svg height="14" width="14" viewBox="0 0 16 16" fill="white">
+                  <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                </svg>
               </div>
-              <p className="text-[#8b949e] text-xs max-w-sm leading-relaxed">
-                Transform your GitHub journey into a cinematic year-in-review experience with AI-powered insights and beautiful visualizations.
-              </p>
+              <div>
+                <h3 className="text-[#39d353] font-black uppercase tracking-wider text-xs">DevWrapped</h3>
+                <p className="text-[#8b949e] text-[10px] font-mono hidden sm:block">AI GitHub Year in Review</p>
+              </div>
             </div>
 
-            {/* Right - Primary Actions */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
                 <a
                   href="https://github.com/Dev-Somesh/Dev-Wrapped"
                   target="_blank"
@@ -324,16 +315,13 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] hover:border-[#58a6ff] rounded-lg transition-all group"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] hover:border-[#58a6ff] rounded-lg transition-all group text-xs font-mono font-bold"
                 >
-                  <svg className="w-4 h-4 text-[#c9d1d9] group-hover:text-[#58a6ff]" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3.5 h-3.5 text-[#c9d1d9] group-hover:text-[#58a6ff]" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
                   </svg>
-                  <span className="text-sm font-mono font-bold text-[#c9d1d9] group-hover:text-[#58a6ff]">
-                    Star Project
-                  </span>
+                  <span className="text-[#c9d1d9] group-hover:text-[#58a6ff]">Star</span>
                 </a>
-                
                 <a
                   href="https://github.com/sponsors/Dev-Somesh"
                   target="_blank"
@@ -346,29 +334,21 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-500/20 to-red-500/20 hover:from-pink-500/30 hover:to-red-500/30 border border-pink-500/30 hover:border-pink-400 rounded-lg transition-all group"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-pink-500/20 to-red-500/20 hover:from-pink-500/30 hover:to-red-500/30 border border-pink-500/30 hover:border-pink-400 rounded-lg transition-all group text-xs font-mono font-bold"
                 >
-                  <svg className="w-4 h-4 text-pink-400 group-hover:text-pink-300" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3.5 h-3.5 text-pink-400 group-hover:text-pink-300" fill="currentColor" viewBox="0 0 16 16">
                     <path d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002ZM4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.58 20.58 0 0 0 8 13.393a20.58 20.58 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"></path>
                   </svg>
-                  <span className="text-sm font-mono font-bold text-pink-400 group-hover:text-pink-300">
-                    Sponsor
-                  </span>
+                  <span className="text-pink-400 group-hover:text-pink-300">Sponsor</span>
                 </a>
               </div>
-              
-              <p className="text-[10px] font-mono text-[#8b949e] text-center">
-                Powered by Google Gemini AI & GitHub Telemetry
-              </p>
-            </div>
           </div>
 
-          {/* Middle Section - Links Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 py-8 border-t border-b border-white/5">
-            {/* Community */}
+          {/* Links Grid - compact */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4 py-4 border-t border-b border-white/5">
             <div>
-              <h4 className="text-[#f0f6fc] font-mono font-bold text-sm mb-4 uppercase tracking-wider">Community</h4>
-              <div className="space-y-3">
+              <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Community</h4>
+              <div className="space-y-1.5">
                 <a
                   href="https://github.com/Dev-Somesh/Dev-Wrapped/issues"
                   target="_blank"
@@ -381,9 +361,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#58a6ff] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#58a6ff] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0Z"/>
                   </svg>
@@ -401,9 +381,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#39d353] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#39d353] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0ZM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3Z"/>
                   </svg>
                   Contribute
@@ -416,9 +396,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#bc8cff] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#bc8cff] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                   </svg>
@@ -427,10 +407,9 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Share */}
             <div>
-              <h4 className="text-[#f0f6fc] font-mono font-bold text-sm mb-4 uppercase tracking-wider">Share</h4>
-              <div className="space-y-3">
+              <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Share</h4>
+              <div className="space-y-1.5">
                 <a
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://devwrapped.netlify.app')}`}
                   target="_blank"
@@ -443,9 +422,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#0077b5] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#0077b5] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                   LinkedIn
@@ -462,9 +441,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-white transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                   Twitter/X
@@ -481,9 +460,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#ff6154] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#ff6154] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M13.604 8.4h-3.405V12h3.405c.995 0 1.801-.806 1.801-1.8s-.806-1.8-1.801-1.8zM12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm1.604 14.4h-3.405V18H7.801V6h5.803c2.319 0 4.199 1.88 4.199 4.2s-1.88 4.2-4.199 4.2z"/>
                   </svg>
                   Product Hunt
@@ -491,10 +470,9 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Developer */}
             <div>
-              <h4 className="text-[#f0f6fc] font-mono font-bold text-sm mb-4 uppercase tracking-wider">Developer</h4>
-              <div className="space-y-3">
+              <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Developer</h4>
+              <div className="space-y-1.5">
                 <a
                   href="https://someshbhardwaj.me"
                   target="_blank"
@@ -507,9 +485,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#58a6ff] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#58a6ff] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-6.5h-2.49A13.65 13.65 0 0 1 12.18 2H14.326c-.365.767-.594 1.61-.656 2.5zM11.855 2a9.267 9.267 0 0 1 .64 1.539 6.688 6.688 0 0 1 .597.933A7.025 7.025 0 0 0 13.745 2H11.855z"/>
                   </svg>
                   Portfolio
@@ -526,9 +504,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#c9d1d9] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
                   </svg>
                   GitHub
@@ -545,9 +523,9 @@ const App: React.FC = () => {
                       page_url: window.location.href
                     });
                   }}
-                  className="flex items-center gap-2 text-[#8b949e] hover:text-[#0077b5] transition-colors text-sm"
+                  className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#0077b5] transition-colors text-xs"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                   LinkedIn
@@ -556,23 +534,17 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Section - Copyright & Status */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-            <div className="flex items-center gap-4 text-[#8b949e]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#8b949e]">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-0.5">
               <span>© {new Date().getFullYear()} Somesh Bhardwaj</span>
-              <span className="opacity-40">•</span>
-              <span className="flex items-center gap-1">
-                Made with <span className="text-[#ff7b72]">❤️</span> for developers
-              </span>
-              <span className="opacity-40">•</span>
-              <span className="text-[#39d353]">Open Source & Free</span>
+              <span className="opacity-40">·</span>
+              <span className="flex items-center gap-0.5">Made with <span className="text-[#ff7b72]">❤️</span> for devs</span>
+              <span className="opacity-40">·</span>
+              <span className="text-[#39d353]">Open Source</span>
             </div>
-            
-            <div className="flex items-center gap-2 text-[#484f58]">
-              <span className="text-[#58a6ff] font-mono">
-                Engine: {activeModel.includes('lite') ? 'Gemini Lite' : 'Gemini 3 Flash'}
-              </span>
-            </div>
+            <span className="text-[#484f58] font-mono text-[9px] sm:text-[10px]">
+              {activeModel.includes('lite') ? 'Gemini Lite' : 'Gemini 3 Flash'}
+            </span>
           </div>
         </div>
       </footer>

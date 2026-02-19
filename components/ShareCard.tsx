@@ -120,9 +120,9 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const containerPadding = 32; // Account for padding
+      const containerPadding = window.innerWidth < 640 ? 24 : 32;
       const availableWidth = Math.min(viewportWidth - containerPadding, 600);
-      const availableHeight = viewportHeight * 0.8; // Use 80% of viewport height
+      const availableHeight = viewportHeight * (window.innerWidth < 640 ? 0.72 : 0.8); // Slightly less on mobile for controls
       
       // Fixed responsive card dimensions - increased size for new content
       const cardWidth = 480;
@@ -471,7 +471,9 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                        .replace(/(streak|pattern|consistency|rhythm|milestone|journey|wrapped)/gi, '<span class="text-[#39d353] font-semibold not-italic">$1</span>')
                    }}
                  />
-                 <button 
+                 <button
+                  type="button"
+                  className="touch-target absolute bottom-2 right-4 min-h-[44px] min-w-[44px] text-[9px] font-mono text-[#39d353] hover:text-white transition-colors uppercase font-black"
                   onClick={() => {
                     setActiveHook((activeHook + 1) % hooks.length);
                     
@@ -492,7 +494,6 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                       });
                     }
                   }}
-                  className="absolute bottom-2 right-4 text-[9px] font-mono text-[#39d353] hover:text-white transition-colors uppercase font-black"
                  >
                    [Cycle_Hook]
                  </button>
