@@ -99,16 +99,10 @@ body {
 .safe-x { padding-left: var(--safe-area-inset-left); padding-right: var(--safe-area-inset-right); }
 .safe-y { padding-top: var(--safe-area-inset-top); padding-bottom: var(--safe-area-inset-bottom); }
 
-/* Main content: tight on mobile, comfortable on desktop */
+/* Main content: tight on mobile, comfortable on desktop (padding now in App main) */
 .main-content-padding {
-  padding-left: max(0.5rem, var(--safe-area-inset-left));
-  padding-right: max(0.5rem, var(--safe-area-inset-right));
-}
-@media (min-width: 768px) {
-  .main-content-padding {
-    padding-left: max(1.5rem, var(--safe-area-inset-left));
-    padding-right: max(1.5rem, var(--safe-area-inset-right));
-  }
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Footer nav links: comfortable touch targets on mobile */

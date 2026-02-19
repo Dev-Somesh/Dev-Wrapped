@@ -262,7 +262,7 @@ const App: React.FC = () => {
       // case Step.Narrative: return insights && <NarrativeSummary insights={insights} onNext={nextStep} onBack={prevStep} />;
       // case Step.Archetype: return insights && <ArchetypeReveal insights={insights} onNext={nextStep} onBack={prevStep} />;
       case Step.Share: return stats && insights && (
-        <div className="w-full flex flex-col items-center pt-8 sm:pt-12 pb-24 no-scrollbar safe-x" style={{ paddingBottom: 'max(6rem, calc(1.5rem + env(safe-area-inset-bottom)))' }}>
+        <div className="w-full min-w-0 flex flex-col items-center pt-3 sm:pt-6 md:pt-10 lg:pt-12 pb-16 sm:pb-20 md:pb-24 overflow-x-hidden safe-x" style={{ paddingBottom: 'max(4rem, calc(1rem + env(safe-area-inset-bottom)))' }}>
           <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />
           <DevelopmentDossier stats={stats} insights={insights} />
         </div>
@@ -272,24 +272,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-[#0d1117] text-[#c9d1d9] flex flex-col relative transition-colors duration-1000 ${step === Step.Analysis ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+    <div className={`min-h-screen bg-[#0d1117] text-[#c9d1d9] flex flex-col relative transition-colors duration-1000 overflow-x-hidden ${step === Step.Analysis ? 'overflow-y-hidden' : 'overflow-y-auto'}`}>
       <BackgroundIcons />
 
-      <main className={`flex-1 w-full max-w-5xl mx-auto z-10 flex flex-col items-center min-h-[calc(100vh-80px)] relative main-content-padding ${step === Step.Entry ? 'justify-start' : 'justify-center'}`}>
+      <main className={`flex-1 w-full mx-auto z-10 flex flex-col items-center min-h-[calc(100vh-80px)] relative main-content-padding min-w-0 ${step === Step.Share ? 'max-w-6xl px-3 sm:px-4 md:px-4 lg:px-6' : 'max-w-5xl px-3 sm:px-4 md:px-6 lg:px-8'} ${step === Step.Entry || step === Step.Share ? 'justify-start' : 'justify-center'}`}>
         {renderStep()}
       </main>
 
-      <footer className="w-full py-5 md:py-6 px-4 md:px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/5 bg-[#0d1117]/80 backdrop-blur-xl relative z-50">
-        {/* Compact divider */}
-        <div className="flex items-center justify-center gap-3 mb-4 opacity-20">
-          <span className="h-px w-8 bg-white/30"></span>
+      <footer className="w-full min-w-0 py-3 px-3 sm:py-4 sm:px-4 md:py-6 md:px-6 lg:px-8 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-white/5 bg-[#0d1117]/80 backdrop-blur-xl relative z-50">
+        {/* Compact on mobile, comfortable on desktop */}
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 opacity-20">
+          <span className="h-px w-6 sm:w-8 bg-white/30"></span>
           <span className="text-[8px] font-mono uppercase tracking-widest text-white/30">Secure_Core_Trace</span>
-          <span className="h-px w-8 bg-white/30"></span>
+          <span className="h-px w-6 sm:w-8 bg-white/30"></span>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto min-w-0 w-full">
           {/* Top: Brand + Actions in one row */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
             <div className="flex items-center gap-2 text-center sm:text-left">
               <div className="w-7 h-7 bg-white/5 border border-white/10 rounded-md flex items-center justify-center flex-shrink-0">
                 <svg height="14" width="14" viewBox="0 0 16 16" fill="white">
@@ -344,9 +344,9 @@ const App: React.FC = () => {
               </div>
           </div>
 
-          {/* Links Grid - compact */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4 py-4 border-t border-b border-white/5">
-            <div>
+          {/* Links Grid: compact on mobile, comfortable on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 py-3 sm:py-4 md:py-6 border-t border-b border-white/5 min-w-0">
+            <div className="min-w-0">
               <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Community</h4>
               <div className="space-y-1.5">
                 <a
@@ -407,7 +407,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Share</h4>
               <div className="space-y-1.5">
                 <a
@@ -470,7 +470,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Developer</h4>
               <div className="space-y-1.5">
                 <a

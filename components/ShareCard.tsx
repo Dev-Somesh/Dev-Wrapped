@@ -120,9 +120,9 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const containerPadding = window.innerWidth < 640 ? 24 : 32;
+      const containerPadding = window.innerWidth < 640 ? 16 : 32;
       const availableWidth = Math.min(viewportWidth - containerPadding, 600);
-      const availableHeight = viewportHeight * (window.innerWidth < 640 ? 0.72 : 0.8); // Slightly less on mobile for controls
+      const availableHeight = viewportHeight * (window.innerWidth < 640 ? 0.65 : 0.8); // More headroom on mobile for nav/controls
       
       // Fixed responsive card dimensions - increased size for new content
       const cardWidth = 480;
@@ -179,7 +179,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       cardRef.current.style.transform = originalTransform;
 
       const link = document.createElement('a');
-      link.download = `devwrapped-2025-${stats.username}.png`;
+      link.download = `devwrapped-${stats.analysisYear ?? 2025}-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
       
@@ -267,36 +267,37 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   });
 
   return (
-    <div className="w-full flex flex-col items-center animate-in fade-in duration-1000">
-      <div className="w-full max-w-8xl px-2 md:px-4 flex justify-between items-end mb-4 md:mb-6">
-        <div className="flex flex-col gap-1">
-          <span className="text-[9px] md:text-[10px] font-mono font-black text-[#39d353] tracking-[0.3em] md:tracking-[0.4em] uppercase">Status: Artifact_Finalized</span>
-          <h2 className="text-[9px] md:text-[10px] font-mono font-bold text-white/20 tracking-[0.4em] md:tracking-[0.5em] uppercase">SECURE_TRACE_ID: {traceId}</h2>
+    <div className="w-full min-w-0 flex flex-col items-center animate-in fade-in duration-1000 overflow-hidden">
+      <div className="w-full max-w-6xl px-3 sm:px-2 lg:px-0 flex justify-between items-end mb-2 sm:mb-4 md:mb-6 gap-1 sm:gap-2 min-w-0">
+        <div className="flex flex-col gap-0.5 sm:gap-1 min-w-0 flex-1 overflow-hidden">
+          <span className="text-[9px] md:text-[10px] font-mono font-black text-[#39d353] tracking-[0.2em] sm:tracking-[0.4em] uppercase truncate">Status: Artifact_Finalized</span>
+          <h2 className="text-[8px] sm:text-[9px] md:text-[10px] font-mono font-bold text-white/20 tracking-[0.2em] sm:tracking-[0.5em] uppercase truncate" title={traceId}>SECURE_TRACE_ID: {traceId}</h2>
         </div>
       </div>
       
-      <div className="flex flex-col xl:flex-row gap-8 md:gap-12 items-start justify-center w-full max-w-8xl px-2 md:px-4">
+      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-12 items-center xl:items-start justify-center w-full max-w-6xl px-3 sm:px-2 lg:px-0 min-w-0">
         
         {/* CARD VIEWER */}
         <div 
           ref={containerRef}
-          className="flex flex-col items-center gap-4 md:gap-6 w-full xl:w-auto flex-shrink-0"
+          className="flex flex-col items-center gap-2 sm:gap-4 md:gap-6 w-full xl:flex-1 xl:min-w-0 flex-shrink-0 max-w-full"
         >
           <div 
-            className="relative flex items-center justify-center transition-all duration-700 ease-in-out w-full max-w-lg md:max-w-none"
+            className="relative flex items-center justify-center transition-all duration-700 ease-in-out w-full"
             style={{ 
               height: `${740 * scale}px`,
-              width: `${480 * scale}px`,
-              maxWidth: '100vw',
+              width: '100%',
+              maxWidth: `${480 * scale}px`,
               transformOrigin: 'top center'
             }}
           >
             <div 
               ref={cardRef}
-              className={`absolute inset-0 bg-[#0d1117] rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 lg:p-10 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col`}
+              className="absolute top-0 left-1/2 bg-[#0d1117] rounded-[1.5rem] md:rounded-[2rem] p-5 sm:p-6 md:p-8 lg:p-10 overflow-hidden border border-[#30363d] shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] flex flex-col origin-top"
               style={{ 
                 width: '480px',
-                height: '740px'
+                height: '740px',
+                transform: `translateX(-50%) scale(${scale})`
               }}
             >
               {/* Background GitHub Logos */}
@@ -338,7 +339,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
               <div className="flex justify-between items-start mb-4 relative z-20 flex-shrink-0">
                 <div className="flex flex-col">
                   <span className="text-[8px] font-mono text-[#8b949e] tracking-[0.3em] uppercase mb-1">DEV_WRAPPED</span>
-                  <span className="text-lg font-display font-black text-white tracking-tighter">2025</span>
+                  <span className="text-lg font-display font-black text-white tracking-tighter">{stats.analysisYear ?? 2025}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
                   <img src={stats.avatarUrl} alt={stats.username} className="w-5 h-5 rounded-full grayscale" />
@@ -376,7 +377,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                      </div>
                      <div className="flex items-start gap-2">
                        <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
-                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.activeDays} active days across 2025 → Consistent execution</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.activeDays} active days across {stats.analysisYear ?? 2025} → Consistent execution</span>
                      </div>
                      <div className="flex items-start gap-2">
                        <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
@@ -448,19 +449,19 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
           </div>
         </div>
 
-        {/* SIDEBAR ACTIONS & SHARE SYSTEM */}
-        <div className="flex flex-col gap-4 md:gap-6 w-full max-w-lg flex-shrink-0">
-           <div className="flex flex-col h-full p-6 md:p-8 lg:p-10 rounded-[1.5rem] md:rounded-[2rem] bg-[#161b22]/40 border border-[#30363d] backdrop-blur-3xl shadow-xl">
+        {/* SIDEBAR ACTIONS & SHARE SYSTEM: on desktop (xl) match DEV_WRAPPED card width (480px) */}
+        <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full xl:w-[480px] xl:max-w-[480px] flex-shrink-0 min-w-0">
+           <div className="flex flex-col h-full p-3 sm:p-5 md:p-8 lg:p-10 rounded-xl sm:rounded-[1.5rem] md:rounded-[2rem] bg-[#161b22]/40 border border-[#30363d] backdrop-blur-3xl shadow-xl min-w-0">
              
              {/* Share Hook Selection */}
-             <div className="mb-8 space-y-4">
-               <h4 className="text-[11px] font-mono text-[#8b949e] uppercase tracking-[0.5em] font-black border-b border-white/5 pb-2">Share_Journey</h4>
+             <div className="mb-4 sm:mb-6 md:mb-8 space-y-2 sm:space-y-4">
+               <h4 className="text-[10px] sm:text-[11px] font-mono text-[#8b949e] uppercase tracking-[0.4em] sm:tracking-[0.5em] font-black border-b border-white/5 pb-1.5 sm:pb-2">Share_Journey</h4>
                
                <p className="text-[11px] font-mono text-[#484f58] italic leading-relaxed px-1">
                  "This isn’t about numbers. It’s about recognizing your rhythm."
                </p>
 
-               <div className="p-5 bg-[#0d1117] border border-white/5 rounded-2xl italic font-light text-[13px] text-[#8b949e] leading-relaxed relative group">
+               <div className="p-3 sm:p-4 md:p-5 bg-[#0d1117] border border-white/5 rounded-xl sm:rounded-2xl italic font-light text-[11px] sm:text-[12px] md:text-[13px] text-[#8b949e] leading-relaxed relative group">
                  <div 
                    className="whitespace-pre-line"
                    dangerouslySetInnerHTML={{
@@ -501,13 +502,13 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
              </div>
 
              {/* Primary Actions */}
-             <div className="space-y-4 mb-8">
+             <div className="space-y-2 sm:space-y-4 mb-4 sm:mb-6 md:mb-8">
                
                {/* Export Image - Primary Action */}
                <button 
                  onClick={downloadImage}
                  disabled={isExporting}
-                 className={`w-full bg-[#f0f6fc] text-[#0d1117] font-black py-5 rounded-full flex items-center justify-center gap-4 hover:bg-white transition-all shadow-xl active:scale-[0.98] text-lg mb-4 ${isExporting ? 'opacity-50 cursor-wait' : ''}`}
+                 className={`w-full bg-[#f0f6fc] text-[#0d1117] font-black py-3 sm:py-4 md:py-5 rounded-full flex items-center justify-center gap-2 sm:gap-4 hover:bg-white transition-all shadow-xl active:scale-[0.98] text-sm sm:text-base md:text-lg mb-2 sm:mb-4 ${isExporting ? 'opacity-50 cursor-wait' : ''}`}
                >
                  {isExporting ? (
                    <div className="w-6 h-6 border-2 border-[#0d1117] border-t-transparent rounded-full animate-spin"></div>
@@ -520,7 +521,8 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                {/* Copy Personalized Text */}
                <button
                  onClick={() => {
-                   const personalizedText = `${hooks[activeHook].text}\n\n🎬 Just got my DevWrapped 2025 results!\n\nArchetype: ${insights.archetype}\n"${insights.archetypeDescription}"\n\n2025 Highlights:\n• ${stats.totalCommits} contributions across ${stats.activeDays} active days\n• ${stats.streak} day longest streak\n• Top languages: ${stats.topLanguages.map(l => l.name).join(', ')}\n\nThe AI insights were surprisingly accurate! Try yours at https://devwrapped.netlify.app\n\n#DevWrapped2025 #YearInCode #GitHub #DeveloperStory`;
+                   const year = stats.analysisYear ?? 2025;
+                   const personalizedText = `${hooks[activeHook].text}\n\n🎬 Just got my DevWrapped ${year} results!\n\nArchetype: ${insights.archetype}\n"${insights.archetypeDescription}"\n\n${year} Highlights:\n• ${stats.totalCommits} contributions across ${stats.activeDays} active days\n• ${stats.streak} day longest streak\n• Top languages: ${stats.topLanguages.map(l => l.name).join(', ')}\n\nThe AI insights were surprisingly accurate! Try yours at https://devwrapped.netlify.app\n\n#DevWrapped${year} #YearInCode #GitHub #DeveloperStory`;
                    navigator.clipboard.writeText(personalizedText);
                    
                    // Track text copy with Mixpanel
@@ -552,13 +554,13 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                      button.classList.remove('bg-[#39d353]/20', 'border-[#39d353]', 'text-[#39d353]');
                    }, 2000);
                  }}
-                 className="w-full mb-4 bg-[#39d353]/10 hover:bg-[#39d353]/20 border border-[#39d353]/20 hover:border-[#39d353] text-[#39d353] hover:text-[#2ea043] py-3 rounded-xl text-[11px] font-mono uppercase tracking-widest font-black transition-all"
+                 className="w-full mb-2 sm:mb-4 bg-[#39d353]/10 hover:bg-[#39d353]/20 border border-[#39d353]/20 hover:border-[#39d353] text-[#39d353] hover:text-[#2ea043] py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-mono uppercase tracking-widest font-black transition-all"
                >
                  📋 Copy Personalized Text
                </button>
                
                {/* Quick Platform Access */}
-               <div className="grid grid-cols-4 gap-2 mb-4">
+               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mb-2 sm:mb-4">
                  <a
                    href="https://www.linkedin.com/feed/"
                    target="_blank"
@@ -581,10 +583,10 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                        });
                      }
                    }}
-                   className="flex flex-col items-center gap-1 p-3 bg-[#0077b5]/10 hover:bg-[#0077b5]/20 border border-[#0077b5]/20 hover:border-[#0077b5] rounded-lg text-[#0077b5] hover:text-[#00a0dc] transition-all"
+                   className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 bg-[#0077b5]/10 hover:bg-[#0077b5]/20 border border-[#0077b5]/20 hover:border-[#0077b5] rounded-lg text-[#0077b5] hover:text-[#00a0dc] transition-all"
                    title="Open LinkedIn"
                  >
-                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                    </svg>
                    <span className="text-[7px] font-mono font-bold">LinkedIn</span>
@@ -612,10 +614,10 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                        });
                      }
                    }}
-                   className="flex flex-col items-center gap-1 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-[#c9d1d9] hover:text-white transition-all"
+                   className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-[#c9d1d9] hover:text-white transition-all"
                    title="Open X (Twitter)"
                  >
-                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                    </svg>
                    <span className="text-[7px] font-mono font-bold">X</span>
@@ -634,10 +636,10 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                        page_url: window.location.href
                      });
                    }}
-                   className="flex flex-col items-center gap-1 p-3 bg-[#E4405F]/10 hover:bg-[#E4405F]/20 border border-[#E4405F]/20 hover:border-[#E4405F] rounded-lg text-[#E4405F] hover:text-[#F56040] transition-all"
+                   className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 bg-[#E4405F]/10 hover:bg-[#E4405F]/20 border border-[#E4405F]/20 hover:border-[#E4405F] rounded-lg text-[#E4405F] hover:text-[#F56040] transition-all"
                    title="Open Instagram"
                  >
-                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                    </svg>
                    <span className="text-[7px] font-mono font-bold">Instagram</span>
@@ -656,10 +658,10 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                        page_url: window.location.href
                      });
                    }}
-                   className="flex flex-col items-center gap-1 p-3 bg-[#ff4500]/10 hover:bg-[#ff4500]/20 border border-[#ff4500]/20 hover:border-[#ff4500] rounded-lg text-[#ff4500] hover:text-[#ff6500] transition-all"
+                   className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 bg-[#ff4500]/10 hover:bg-[#ff4500]/20 border border-[#ff4500]/20 hover:border-[#ff4500] rounded-lg text-[#ff4500] hover:text-[#ff6500] transition-all"
                    title="Open Reddit"
                  >
-                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                      <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 2.21-.763zM6.25 13c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25S6.94 13 6.25 13zm7.5 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25S14.44 13 13.75 13zm-5.69 3.94c.463-.89 1.281-1.44 2.19-1.44s1.727.55 2.19 1.44a.25.25 0 0 1-.48.14c-.197-.51-.787-.8-1.71-.8s-1.513.29-1.71.8a.25.25 0 0 1-.48-.14z"/>
                    </svg>
                    <span className="text-[7px] font-mono font-bold">Reddit</span>
@@ -674,8 +676,8 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
              </div>
 
              {/* Product Hunt Review CTA */}
-             <div className="mt-6 p-4 bg-gradient-to-r from-[#ff6154]/10 to-[#ff9500]/10 border border-[#ff6154]/20 rounded-xl text-center">
-               <p className="text-[11px] font-mono text-[#c9d1d9] mb-3 leading-relaxed">
+             <div className="mt-3 sm:mt-6 p-3 sm:p-4 bg-gradient-to-r from-[#ff6154]/10 to-[#ff9500]/10 border border-[#ff6154]/20 rounded-lg sm:rounded-xl text-center">
+               <p className="text-[10px] sm:text-[11px] font-mono text-[#c9d1d9] mb-2 sm:mb-3 leading-relaxed">
                  🎉 <span className="text-[#ff6154] font-semibold">Enjoyed your DevWrapped?</span> Help us reach more developers!
                </p>
                <a
@@ -720,7 +722,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                    
                    onReset();
                  }}
-                 className="w-full bg-transparent border border-[#30363d] text-[#8b949e] font-black py-4 rounded-full hover:bg-[#161b22] hover:text-[#f0f6fc] transition-all active:scale-[0.98] text-[11px] uppercase tracking-widest"
+                 className="w-full bg-transparent border border-[#30363d] text-[#8b949e] font-black py-3 sm:py-4 rounded-full hover:bg-[#161b22] hover:text-[#f0f6fc] transition-all active:scale-[0.98] text-[10px] sm:text-[11px] uppercase tracking-widest"
                >
                  Start New Analysis
                </button>

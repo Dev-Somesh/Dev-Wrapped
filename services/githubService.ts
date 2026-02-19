@@ -6,15 +6,45 @@ import { GitHubStats, GitHubRepo } from '../types';
  */
 const CLIENT_TIMEOUT_MS = 25000;
 
+const GITHUB_API_BASE = 'https://api.github.com';
+
 /**
- * Calls the Netlify serverless function to proxy GitHub API calls.
- * This avoids CORS issues. No authentication required - public data only.
+ * In dev (Vite only), call GitHub API directly. In production or with Netlify Dev, use the proxy.
+ */
+const fetchFromGitHub = async (endpoint: string, username: string, timeoutMs: number, signal: AbortSignal): Promise<any> => {
+  const url = `${GITHUB_API_BASE}${endpoint.replace('{username}', username)}`;
+  const response = await fetch(url, {
+    headers: {
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'DevWrapped-2025',
+    },
+    signal,
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const message = data.message || `HTTP ${response.status}`;
+    if (response.status === 404) throw new Error(`GITHUB_USER_NOT_FOUND: The user profile "${username}" does not exist.`);
+    if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') throw new Error('GITHUB_RATE_LIMIT: API quota exceeded. Please wait a moment before trying again.');
+    throw new Error(message);
+  }
+  return response.json();
+};
+
+/**
+ * Calls the Netlify serverless function to proxy GitHub API calls (production).
+ * In development without Netlify, calls GitHub API directly so localhost works.
  */
 const fetchViaProxy = async (endpoint: string, username: string, timeoutMs: number = 8000): Promise<any> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    if (import.meta.env.DEV) {
+      const result = await fetchFromGitHub(endpoint, username, timeoutMs, controller.signal);
+      clearTimeout(timeoutId);
+      return result;
+    }
+
     const response = await fetch('/.netlify/functions/github-proxy', {
       method: 'POST',
       headers: {
@@ -37,11 +67,11 @@ const fetchViaProxy = async (endpoint: string, username: string, timeoutMs: numb
     return response.json();
   } catch (error: any) {
     clearTimeout(timeoutId);
-    
+
     if (error.name === 'AbortError' || error.message?.includes('timeout')) {
       throw new Error('GITHUB_API_TIMEOUT: Request timed out. GitHub API may be slow. Please retry.');
     }
-    
+
     throw error;
   }
 };

@@ -216,7 +216,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
   ];
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center px-2 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 md:justify-center animate-in fade-in duration-1000 relative overflow-x-hidden">
+    <div className="w-full min-h-screen flex flex-col items-center px-0 sm:px-2 py-8 sm:py-12 md:py-16 lg:py-20 md:justify-center animate-in fade-in duration-1000 relative overflow-x-hidden min-w-0">
       
       {/* 1. THE NARRATIVE (Top Left) */}
       <FeaturePreview 
@@ -292,7 +292,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
       />
 
       {/* Top Branding - Compact logo + menu */}
-      <nav className="fixed top-0 left-0 w-full pl-4 pr-3 py-2.5 sm:pl-5 sm:pr-4 sm:py-3 md:pl-6 md:pr-6 flex justify-between items-center pointer-events-none z-50 safe-x" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingLeft: 'max(1rem, env(safe-area-inset-left))' }}>
+      <nav className="fixed top-0 left-0 right-0 w-full min-w-0 pl-3 pr-3 py-2.5 sm:pl-4 sm:pr-4 sm:py-3 md:pl-6 md:pr-6 flex justify-between items-center pointer-events-none z-50 safe-x" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingLeft: 'max(0.75rem, env(safe-area-inset-left))', paddingRight: 'max(0.75rem, env(safe-area-inset-right))' }}>
         <a href="/" className="flex items-center gap-2 pointer-events-auto rounded-lg hover:bg-white/5 transition-colors p-1 pl-2 sm:pl-3" aria-label="DevWrapped home">
           <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-md flex items-center justify-center flex-shrink-0">
             <svg height="14" width="14" className="sm:w-4 sm:h-4" viewBox="0 0 16 16" fill="white">
@@ -365,21 +365,21 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
         </>
       )}
 
-      {/* Year Banner - compact */}
-      <div className="w-full flex justify-center pt-12 sm:pt-16 md:pt-24 pb-3 sm:pb-4 md:pb-8 relative z-10">
+      {/* Year Banner: compact on mobile, comfortable on desktop */}
+      <div className="w-full flex justify-center pt-10 sm:pt-14 md:pt-20 lg:pt-24 pb-2 sm:pb-4 md:pb-8 relative z-10">
         <YearBanner />
       </div>
 
-      {/* Main Content Stack - compact hero, full width on mobile */}
-      <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10">
+      {/* Main Content Stack: compact on mobile, spacious on desktop */}
+      <div className="max-w-5xl w-full min-w-0 flex flex-col items-center text-center relative z-10">
         
-        <div className="mb-5 sm:mb-8 md:mb-12 lg:mb-16 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6">
-          <div className="inline-block px-2.5 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-0.5 md:mb-2">
+        <div className="mb-3 sm:mb-6 md:mb-10 lg:mb-16 space-y-1.5 sm:space-y-3 md:space-y-4 lg:space-y-6">
+          <div className="inline-block px-2 sm:px-3 md:px-4 py-0.5 sm:py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-0 sm:mb-0.5 md:mb-2">
             <span className="text-[#8b949e] font-mono text-[8px] sm:text-[9px] md:text-[9px] uppercase tracking-[0.25em] sm:tracking-[0.4em] md:tracking-[0.5em] font-black">
               Engineering Year-in-Review
             </span>
           </div>
-          <h1 className="text-[1.5rem] leading-[1.08] sm:text-2xl sm:leading-[1.05] md:text-5xl md:leading-[0.9] lg:text-6xl xl:text-[4.5rem] 2xl:text-[7.5rem] 2xl:leading-[0.75] font-display font-black tracking-tighter text-[#f0f6fc] select-none">
+          <h1 className="text-[1.75rem] leading-[1.12] sm:text-3xl sm:leading-[1.08] md:text-4xl md:leading-[1.05] lg:text-5xl lg:leading-[0.95] xl:text-6xl xl:leading-[0.9] font-display font-black tracking-tighter text-[#f0f6fc] select-none break-words">
             CELEBRATE<br />YOUR 2025<br />
             <span className="animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-[#39d353] via-[#58a6ff] to-[#bc8cff] drop-shadow-[0_0_40px_rgba(57,211,83,0.15)]">
               CODE JOURNEY.
@@ -389,37 +389,37 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
             New Year, New Reflections. Celebrate your incredible 2025 coding achievements with a beautiful year-in-review.
           </p>
           
-          <div className="mt-4 sm:mt-6 md:mt-10 lg:mt-12 max-w-2xl mx-auto">
-            <p className="text-[9px] md:text-[10px] lg:text-xs font-mono text-[#39d353] uppercase tracking-wider font-black mb-2 md:mb-4 text-center">
+          <div className="mt-3 sm:mt-5 md:mt-10 lg:mt-12 max-w-2xl mx-auto">
+            <p className="text-[9px] md:text-[10px] lg:text-xs font-mono text-[#39d353] uppercase tracking-wider font-black mb-1.5 sm:mb-2 md:mb-4 text-center">
               Perfect For
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-3 md:gap-4 lg:gap-5 w-full">
               {[
                 { icon: "💼", text: "Job Applications" },
                 { icon: "📁", text: "Portfolio Content" },
                 { icon: "🚀", text: "Founder Stories" },
                 { icon: "📈", text: "Hiring Signals" }
               ].map((useCase, i) => (
-                <div key={i} className="flex flex-col items-center gap-1 sm:gap-1.5 md:gap-2 p-2 sm:p-3 md:p-4 lg:p-5 bg-white/5 rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10 hover:border-[#39d353]/30 transition-all group min-h-0">
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl group-hover:scale-110 transition-transform">{useCase.icon}</span>
-                  <span className="text-[10px] sm:text-[11px] md:text-xs font-mono text-[#c9d1d9] text-center font-medium leading-tight">
+                <div key={i} className="flex flex-col items-center gap-0.5 sm:gap-1.5 md:gap-2 p-1.5 sm:p-3 md:p-4 lg:p-5 bg-white/5 rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10 hover:border-[#39d353]/30 transition-all group min-h-0 min-w-0">
+                  <span className="text-base sm:text-lg md:text-xl lg:text-2xl group-hover:scale-110 transition-transform">{useCase.icon}</span>
+                  <span className="text-[9px] sm:text-[11px] md:text-xs font-mono text-[#c9d1d9] text-center font-medium leading-tight">
                     {useCase.text}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="text-[9px] md:text-[10px] lg:text-xs font-mono text-[#8b949e] text-center mt-2 md:mt-4 italic">
+            <p className="text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-mono text-[#8b949e] text-center mt-1.5 sm:mt-2 md:mt-4 italic">
               Use this artifact in portfolios, interviews, and founder stories.
             </p>
           </div>
         </div>
 
-        {/* Entry form - compact on mobile, full size on desktop */}
-        <div className="w-full max-w-[320px] sm:max-w-sm md:max-w-md relative group mt-0">
+        {/* Entry form: compact on mobile, comfortable on desktop */}
+        <div className="w-full max-w-[320px] sm:max-w-sm md:max-w-md relative group mt-0 min-w-0">
           <div className="absolute -inset-0.5 sm:-inset-1 md:-inset-1.5 bg-gradient-to-br from-[#39d353]/20 to-[#58a6ff]/20 rounded-xl md:rounded-[2rem] lg:rounded-[3rem] blur-xl md:blur-2xl opacity-40 group-hover:opacity-70 transition duration-1000"></div>
           
-          <div className="relative bg-[#161b22]/80 backdrop-blur-3xl border border-[#30363d] p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 rounded-xl md:rounded-[2rem] lg:rounded-[3rem] shadow-2xl">
-            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 lg:space-y-6">
+          <div className="relative bg-[#161b22]/80 backdrop-blur-3xl border border-[#30363d] p-3 sm:p-5 md:p-6 lg:p-8 xl:p-10 rounded-xl md:rounded-[2rem] lg:rounded-[3rem] shadow-2xl">
+            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-4 md:space-y-5 lg:space-y-6">
               <div className="space-y-2 md:space-y-3 text-left">
                 <label className="text-[8px] md:text-[10px] lg:text-xs font-mono text-[#484f58] uppercase tracking-wider md:tracking-[0.2em] ml-2 md:ml-4 font-black">Initialization Profile</label>
                 <div className="relative group/input">
@@ -535,7 +535,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
 
       </div>
       
-      <div className="mt-6 sm:mt-10 md:mt-20 w-full">
+      <div className="mt-4 sm:mt-8 md:mt-16 lg:mt-20 w-full">
         <DeveloperCarousel />
       </div>
     </div>

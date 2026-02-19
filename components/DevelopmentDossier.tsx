@@ -75,7 +75,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         }
       });
       const link = document.createElement('a');
-      link.download = `dev-dossier-2025-${stats.username}.png`;
+      link.download = `dev-dossier-${stats.analysisYear ?? 2025}-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
       
@@ -119,16 +119,16 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
   };
 
   return (
-    <div className="w-full max-w-5xl mt-12 md:mt-24 mb-16 md:mb-32 animate-in fade-in duration-1000 px-4 md:px-0" style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6 md:gap-0">
-        <div className="space-y-2 text-center md:text-left w-full md:w-auto">
-          <h3 className="text-2xl md:text-4xl font-display font-black text-white tracking-tighter uppercase">Intelligence Dossier</h3>
-          <p className="text-[#8b949e] font-light italic text-base md:text-lg">Comprehensive analysis of the 2025 development cycle.</p>
+    <div className="w-full max-w-5xl min-w-0 mt-4 sm:mt-8 md:mt-16 lg:mt-24 mb-10 sm:mb-16 md:mb-24 lg:mb-32 animate-in fade-in duration-1000 px-0 sm:px-2 md:px-0" style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 md:mb-10 lg:mb-12 gap-3 sm:gap-6 md:gap-0">
+        <div className="space-y-1 sm:space-y-2 text-center md:text-left w-full md:w-auto">
+          <h3 className="text-xl sm:text-2xl md:text-4xl font-display font-black text-white tracking-tighter uppercase">Intelligence Dossier</h3>
+          <p className="text-[#8b949e] font-light italic text-sm sm:text-base md:text-lg">Comprehensive analysis of the {stats.analysisYear ?? 2025} development cycle.</p>
         </div>
         <button 
           onClick={exportFullReport}
           disabled={isExporting}
-          className="bg-[#39d353] text-black hover:bg-[#2ea043] px-4 md:px-8 py-3 md:py-4 rounded-full text-[10px] md:text-xs font-mono uppercase tracking-widest transition-all flex items-center gap-2 md:gap-3 active:scale-95 font-black shadow-xl w-full md:w-auto justify-center"
+          className="bg-[#39d353] text-black hover:bg-[#2ea043] px-3 sm:px-4 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full text-[9px] sm:text-[10px] md:text-xs font-mono uppercase tracking-widest transition-all flex items-center gap-1.5 sm:gap-2 md:gap-3 active:scale-95 font-black shadow-xl w-full md:w-auto justify-center"
         >
           {isExporting ? 'Processing...' : (
             <>
@@ -144,7 +144,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
 
       <div 
         ref={reportRef}
-        className="bg-[#0d1117] border border-[#30363d] rounded-2xl md:rounded-[3.5rem] p-4 md:p-8 lg:p-20 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden"
+        className="bg-[#0d1117] border border-[#30363d] rounded-xl sm:rounded-2xl md:rounded-[3.5rem] p-3 sm:p-5 md:p-8 lg:p-16 xl:p-20 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden min-w-0"
       >
         {/* Background GitHub Logos */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -190,43 +190,43 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
             </svg>
           </div>
         </div>
-        {/* Dossier Header - Mobile Optimized */}
-        <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-12 mb-12 md:mb-20 pb-8 md:pb-12 border-b border-[#30363d]">
-          <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-8 text-center sm:text-left">
-            <img src={stats.avatarUrl} className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-[#30363d] grayscale" alt={stats.username} />
+        {/* Dossier Header: compact on mobile, comfortable on desktop */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 sm:gap-6 md:gap-12 mb-6 sm:mb-10 md:mb-20 pb-4 sm:pb-6 md:pb-12 border-b border-[#30363d]">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-8 text-center sm:text-left">
+            <img src={stats.avatarUrl} className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 rounded-full border-2 sm:border-4 border-[#30363d] grayscale" alt={stats.username} />
             <div>
-              <h4 className="text-2xl md:text-4xl font-display font-black text-white mb-1 md:mb-2">@{stats.username}</h4>
-              <p className="text-[#39d353] font-mono text-sm md:text-base tracking-widest uppercase font-bold">{insights.archetype}</p>
+              <h4 className="text-xl sm:text-2xl md:text-4xl font-display font-black text-white mb-0.5 sm:mb-1 md:mb-2">@{stats.username}</h4>
+              <p className="text-[#39d353] font-mono text-xs sm:text-sm md:text-base tracking-widest uppercase font-bold">{insights.archetype}</p>
             </div>
           </div>
           <div className="text-center md:text-right flex flex-col justify-center">
-            <span className="text-[10px] md:text-[11px] font-mono text-[#484f58] uppercase tracking-[0.4em] md:tracking-[0.6em] mb-2 md:mb-3">Classification</span>
-            <p className="text-base md:text-xl text-[#c9d1d9] font-light italic leading-relaxed max-w-sm mx-auto md:ml-auto">
+            <span className="text-[9px] sm:text-[10px] md:text-[11px] font-mono text-[#484f58] uppercase tracking-[0.4em] md:tracking-[0.6em] mb-1 sm:mb-2 md:mb-3">Classification</span>
+            <p className="text-xs sm:text-sm md:text-base lg:text-xl text-[#c9d1d9] font-light italic leading-relaxed max-w-sm mx-auto md:ml-auto">
               "{insights.archetypeDescription}"
             </p>
           </div>
         </div>
 
         {/* Executive Summary */}
-        <section className="mb-24 relative z-10">
-          <h5 className="text-[11px] font-mono text-[#58a6ff] uppercase tracking-[0.7em] mb-10 font-black">Executive Summary</h5>
-          <div className="bg-[#161b22]/30 border border-[#30363d] p-8 md:p-12 rounded-[3rem]">
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
-                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+        <section className="mb-8 sm:mb-12 md:mb-20 lg:mb-24 relative z-10">
+          <h5 className="text-[10px] sm:text-[11px] font-mono text-[#58a6ff] uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-3 sm:mb-6 md:mb-10 font-black">Executive Summary</h5>
+          <div className="bg-[#161b22]/30 border border-[#30363d] p-3 sm:p-5 md:p-8 lg:p-12 rounded-xl sm:rounded-2xl md:rounded-[3rem] overflow-hidden">
+            <div className="space-y-2 sm:space-y-4">
+              <div className="flex items-start gap-2 sm:gap-4">
+                <span className="text-[#58a6ff] font-mono text-[11px] sm:text-[12px] pt-1 font-black">•</span>
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-[#c9d1d9] leading-relaxed font-light">
                   Operates in focused, high-intensity development cycles with {stats.activeDays} active days
                 </p>
               </div>
-              <div className="flex items-start gap-4">
-                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
-                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+              <div className="flex items-start gap-2 sm:gap-4">
+                <span className="text-[#58a6ff] font-mono text-[11px] sm:text-[12px] pt-1 font-black">•</span>
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-[#c9d1d9] leading-relaxed font-light">
                   Demonstrates system-level thinking across {stats.reposContributed} repositories
                 </p>
               </div>
-              <div className="flex items-start gap-4">
-                <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">•</span>
-                <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light">
+              <div className="flex items-start gap-2 sm:gap-4">
+                <span className="text-[#58a6ff] font-mono text-[11px] sm:text-[12px] pt-1 font-black">•</span>
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-[#c9d1d9] leading-relaxed font-light">
                   Delivers peak output during {stats.mostActiveMonth} with sustained {stats.streak}-day streaks
                 </p>
               </div>
@@ -235,42 +235,42 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </section>
 
         {/* Section I */}
-        <section className="mb-24 relative z-10">
-          <h5 className="text-[11px] font-mono text-[#39d353] uppercase tracking-[0.7em] mb-10 font-black">Section I // The Narrative</h5>
-          <div className="bg-[#161b22]/30 border border-[#30363d] p-12 rounded-[3rem]">
+        <section className="mb-8 sm:mb-12 md:mb-20 lg:mb-24 relative z-10">
+          <h5 className="text-[10px] sm:text-[11px] font-mono text-[#39d353] uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-3 sm:mb-6 md:mb-10 font-black">Section I // The Narrative</h5>
+          <div className="bg-[#161b22]/30 border border-[#30363d] p-3 sm:p-5 md:p-8 lg:p-12 rounded-xl sm:rounded-2xl md:rounded-[3rem] overflow-hidden">
             <div 
-              className="text-lg md:text-xl font-display text-[#f0f6fc] leading-relaxed font-light italic opacity-95"
+              className="text-sm sm:text-base md:text-lg lg:text-xl font-display text-[#f0f6fc] leading-relaxed font-light italic opacity-95 break-words"
               dangerouslySetInnerHTML={{ 
-                __html: `<p class="mb-6">${highlightText(insights.narrative)}</p>`
+                __html: `<p class="mb-4 sm:mb-6">${highlightText(insights.narrative)}</p>`
               }}
             />
           </div>
         </section>
 
         {/* Section II & III */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24 relative z-10">
-          <section>
-            <h5 className="text-[11px] font-mono text-purple-500 uppercase tracking-[0.7em] mb-10 font-black">Section II // Intelligence Observations</h5>
-            <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-16 mb-8 sm:mb-12 md:mb-20 lg:mb-24 relative z-10">
+          <section className="min-w-0">
+            <h5 className="text-[10px] sm:text-[11px] font-mono text-purple-500 uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-3 sm:mb-6 md:mb-10 font-black">Section II // Intelligence Observations</h5>
+            <div className="space-y-2 sm:space-y-4 md:space-y-6">
               {insights.insights.map((ins, i) => (
-                <div key={i} className="flex gap-6 p-7 bg-white/5 rounded-[2rem] border border-white/5 transition-all hover:bg-white/10">
-                  <span className="text-purple-500 font-mono text-[12px] pt-1 font-black">0{i+1}</span>
+                <div key={i} className="flex gap-2 sm:gap-4 md:gap-6 p-3 sm:p-5 md:p-7 bg-white/5 rounded-lg sm:rounded-xl md:rounded-[2rem] border border-white/5 transition-all hover:bg-white/10 min-w-0">
+                  <span className="text-purple-500 font-mono text-[10px] sm:text-[12px] pt-1 font-black flex-shrink-0">0{i+1}</span>
                   <p 
-                    className="text-base text-[#c9d1d9] leading-relaxed font-light"
+                    className="text-xs sm:text-sm md:text-base text-[#c9d1d9] leading-relaxed font-light break-words min-w-0"
                     dangerouslySetInnerHTML={{ __html: highlightText(ins) }}
                   />
                 </div>
               ))}
             </div>
           </section>
-          <section>
-            <h5 className="text-[11px] font-mono text-[#58a6ff] uppercase tracking-[0.7em] mb-10 font-black">Section III // Behavioral Patterns</h5>
-            <div className="space-y-6">
+          <section className="min-w-0">
+            <h5 className="text-[10px] sm:text-[11px] font-mono text-[#58a6ff] uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-3 sm:mb-6 md:mb-10 font-black">Section III // Behavioral Patterns</h5>
+            <div className="space-y-2 sm:space-y-4 md:space-y-6">
               {insights.patterns.map((pat, i) => (
-                <div key={i} className="flex gap-6 p-7 bg-white/5 rounded-[2rem] border border-white/5 transition-all hover:bg-white/10">
-                  <span className="text-[#58a6ff] font-mono text-[12px] pt-1 font-black">PK</span>
+                <div key={i} className="flex gap-2 sm:gap-4 md:gap-6 p-3 sm:p-5 md:p-7 bg-white/5 rounded-lg sm:rounded-xl md:rounded-[2rem] border border-white/5 transition-all hover:bg-white/10 min-w-0">
+                  <span className="text-[#58a6ff] font-mono text-[10px] sm:text-[12px] pt-1 font-black flex-shrink-0">PK</span>
                   <p 
-                    className="text-base text-[#c9d1d9] leading-relaxed font-light"
+                    className="text-xs sm:text-sm md:text-base text-[#c9d1d9] leading-relaxed font-light break-words min-w-0"
                     dangerouslySetInnerHTML={{ __html: highlightText(pat) }}
                   />
                 </div>
@@ -280,41 +280,41 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </div>
 
         {/* Strategic Outlook */}
-        <section className="mb-24 relative z-10">
-          <h5 className="text-[11px] font-mono text-[#ff7b72] uppercase tracking-[0.7em] mb-10 font-black">Strategic Outlook</h5>
-          <div className="bg-[#161b22]/30 border border-[#30363d] p-8 md:p-12 rounded-[3rem]">
-            <div className="space-y-8">
-              <div className="flex gap-6">
-                <span className="text-[#ff7b72] font-mono text-[14px] font-black">1.</span>
+        <section className="mb-8 sm:mb-12 md:mb-20 lg:mb-24 relative z-10">
+          <h5 className="text-[10px] sm:text-[11px] font-mono text-[#ff7b72] uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-3 sm:mb-6 md:mb-10 font-black">Strategic Outlook</h5>
+          <div className="bg-[#161b22]/30 border border-[#30363d] p-3 sm:p-5 md:p-8 lg:p-12 rounded-xl sm:rounded-2xl md:rounded-[3rem] overflow-hidden">
+            <div className="space-y-4 sm:space-y-6 md:space-y-8">
+              <div className="flex gap-2 sm:gap-6">
+                <span className="text-[#ff7b72] font-mono text-[11px] sm:text-[14px] font-black">1.</span>
                 <div>
-                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                  <p className="text-xs sm:text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-1 sm:mb-2">
                     <span className="font-semibold">Sustainability Signal</span>
                   </p>
-                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                  <p className="text-[11px] sm:text-sm text-[#8b949e] leading-relaxed">
                     Sprint-heavy execution with {stats.activeDays} active days suggests high throughput but may indicate need for sustainable pacing cycles.
                   </p>
                 </div>
               </div>
               
-              <div className="flex gap-6">
-                <span className="text-[#ff7b72] font-mono text-[14px] font-black">2.</span>
+              <div className="flex gap-2 sm:gap-6">
+                <span className="text-[#ff7b72] font-mono text-[11px] sm:text-[14px] font-black">2.</span>
                 <div>
-                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                  <p className="text-xs sm:text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-1 sm:mb-2">
                     <span className="font-semibold">Growth Opportunity</span>
                   </p>
-                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                  <p className="text-[11px] sm:text-sm text-[#8b949e] leading-relaxed">
                     Strong {stats.topLanguages[0]?.name || 'technical'} dominance suggests readiness for deeper system ownership or platform leadership roles.
                   </p>
                 </div>
               </div>
               
-              <div className="flex gap-6">
-                <span className="text-[#ff7b72] font-mono text-[14px] font-black">3.</span>
+              <div className="flex gap-2 sm:gap-6">
+                <span className="text-[#ff7b72] font-mono text-[11px] sm:text-[14px] font-black">3.</span>
                 <div>
-                  <p className="text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-2">
+                  <p className="text-xs sm:text-base md:text-lg text-[#c9d1d9] leading-relaxed font-light mb-1 sm:mb-2">
                     <span className="font-semibold">Collaboration Vector</span>
                   </p>
-                  <p className="text-sm text-[#8b949e] leading-relaxed">
+                  <p className="text-[11px] sm:text-sm text-[#8b949e] leading-relaxed">
                     Multi-repo orchestration across {stats.reposContributed} repositories indicates high solo throughput; next leverage may come from visible team leadership.
                   </p>
                 </div>
@@ -323,10 +323,10 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
           </div>
         </section>
 
-        {/* Section IV - Mobile Optimized */}
-        <section className="mb-16 md:mb-24 px-2 md:px-0">
-          <h5 className="text-[11px] font-mono text-[#ff7b72] uppercase tracking-[0.5em] md:tracking-[0.7em] mb-8 md:mb-10 font-black">Section IV // Core Contribution Metrics</h5>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+        {/* Section IV: compact on mobile, comfortable on desktop */}
+        <section className="mb-8 sm:mb-12 md:mb-20 lg:mb-24 px-0">
+          <h5 className="text-[10px] sm:text-[11px] font-mono text-[#ff7b72] uppercase tracking-[0.5em] md:tracking-[0.7em] mb-4 sm:mb-6 md:mb-10 font-black">Section IV // Core Contribution Metrics</h5>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 md:gap-6 min-w-0">
             {[
               { label: 'Total Contributions', val: stats.totalCommits },
               { label: 'Active Cycle Days', val: stats.activeDays },
@@ -337,34 +337,34 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
               { label: 'Followers', val: stats.followers },
               { label: 'Following', val: stats.following },
             ].map((m, i) => (
-              <div key={i} className="p-4 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-[#161b22]/40 border border-[#30363d] text-center shadow-xl hover:scale-105 transition-transform duration-500 flex flex-col justify-center items-center">
-                <span className="block text-xl md:text-3xl lg:text-4xl font-display font-black text-white mb-2 md:mb-3 whitespace-nowrap">{m.val}</span>
-                <span className="text-[8px] md:text-[10px] text-[#484f58] uppercase font-mono tracking-widest font-black leading-tight break-words max-w-[100px] md:max-w-[140px] text-center">{m.label}</span>
+              <div key={i} className="p-2.5 sm:p-4 md:p-8 lg:p-10 rounded-lg sm:rounded-xl md:rounded-[2.5rem] bg-[#161b22]/40 border border-[#30363d] text-center shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 flex flex-col justify-center items-center min-w-0 overflow-hidden">
+                <span className="block text-sm sm:text-lg md:text-3xl lg:text-4xl font-display font-black text-white mb-0.5 sm:mb-2 md:mb-3 truncate w-full">{m.val}</span>
+                <span className="text-[7px] sm:text-[8px] md:text-[10px] text-[#484f58] uppercase font-mono tracking-widest font-black leading-tight break-words max-w-full text-center">{m.label}</span>
               </div>
             ))}
           </div>
 
           {/* Profile Information Row - Mobile Optimized */}
           {(stats.bio || stats.company || stats.location) && (
-            <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 px-2 md:px-0">
+            <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 min-w-0">
               {stats.bio && (
-                <div className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
-                  <h6 className="text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 md:mb-3 font-black">Bio</h6>
-                  <p className="text-xs md:text-sm text-white leading-relaxed">{stats.bio}</p>
+                <div className="p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[8px] sm:text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-1 sm:mb-2 md:mb-3 font-black">Bio</h6>
+                  <p className="text-[11px] sm:text-xs md:text-sm text-white leading-relaxed">{stats.bio}</p>
                 </div>
               )}
               
               {stats.company && (
-                <div className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
-                  <h6 className="text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 md:mb-3 font-black">Company</h6>
-                  <p className="text-xs md:text-sm text-white font-medium">{stats.company}</p>
+                <div className="p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[8px] sm:text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-1 sm:mb-2 md:mb-3 font-black">Company</h6>
+                  <p className="text-[11px] sm:text-xs md:text-sm text-white font-medium">{stats.company}</p>
                 </div>
               )}
               
               {stats.location && (
-                <div className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
-                  <h6 className="text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 md:mb-3 font-black">Location</h6>
-                  <p className="text-xs md:text-sm text-white font-medium">{stats.location}</p>
+                <div className="p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/5">
+                  <h6 className="text-[8px] sm:text-[9px] md:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-1 sm:mb-2 md:mb-3 font-black">Location</h6>
+                  <p className="text-[11px] sm:text-xs md:text-sm text-white font-medium">{stats.location}</p>
                 </div>
               )}
             </div>
@@ -372,13 +372,13 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </section>
 
         {/* Section V */}
-        <section className="mb-24">
-          <h5 className="text-[11px] font-mono text-white uppercase tracking-[0.7em] mb-10 font-black">Section V // Technical DNA Landscape</h5>
+        <section className="mb-12 sm:mb-16 md:mb-24">
+          <h5 className="text-[9px] sm:text-[10px] md:text-[11px] font-mono text-white uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-4 sm:mb-6 md:mb-10 font-black">Section V // Technical DNA Landscape</h5>
           
           {/* Tech Stack Logo Cloud */}
-          <div className="mb-12">
-            <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-6 font-black text-center">Technology Stack</h6>
-            <div className="flex flex-wrap justify-center items-center gap-4 p-8 bg-[#161b22]/20 rounded-2xl border border-[#30363d]/30">
+          <div className="mb-6 sm:mb-8 md:mb-12">
+            <h6 className="text-[9px] sm:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-3 sm:mb-6 font-black text-center">Technology Stack</h6>
+            <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 bg-[#161b22]/20 rounded-xl sm:rounded-2xl border border-[#30363d]/30">
               {stats.allLanguages.slice(0, 15).map((lang, i) => {
                 // Map languages to colors and icons
                 const getTechStyle = (language: string) => {
@@ -414,42 +414,42 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                 return (
                   <div
                     key={i}
-                    className="flex flex-col items-center p-3 rounded-xl transition-all hover:scale-110 cursor-default"
+                    className="flex flex-col items-center p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all hover:scale-110 cursor-default"
                     style={{ backgroundColor: style.bg }}
                   >
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center mb-2 font-black text-xs"
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center mb-1 sm:mb-2 font-black text-[10px] sm:text-xs"
                       style={{ backgroundColor: style.color, color: '#000' }}
                     >
                       {lang.name.slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="text-[9px] font-mono text-white font-medium">{lang.name}</span>
-                    <span className="text-[8px] font-mono text-[#8b949e]">{lang.count}</span>
+                    <span className="text-[8px] sm:text-[9px] font-mono text-white font-medium">{lang.name}</span>
+                    <span className="text-[7px] sm:text-[8px] font-mono text-[#8b949e]">{lang.count}</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="col-span-1 space-y-5">
-              <h6 className="text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-4 font-black">Top Languages</h6>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+            <div className="col-span-1 space-y-2 sm:space-y-5">
+              <h6 className="text-[9px] sm:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 sm:mb-4 font-black">Top Languages</h6>
               {stats.topLanguages.map((lang, i) => (
-                <div key={i} className="flex justify-between items-center p-6 rounded-2xl bg-white/5 border border-white/5">
-                  <span className="text-base text-white font-bold">{lang.name}</span>
-                  <span className="text-[12px] font-mono text-[#8b949e]">{lang.count} Repos</span>
+                <div key={i} className="flex justify-between items-center p-3 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5">
+                  <span className="text-xs sm:text-sm md:text-base text-white font-bold">{lang.name}</span>
+                  <span className="text-[10px] sm:text-[12px] font-mono text-[#8b949e]">{lang.count} Repos</span>
                 </div>
               ))}
             </div>
-            <div className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <h6 className="col-span-full text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-2 font-black">Recent Projects</h6>
+            <div className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+              <h6 className="col-span-full text-[9px] sm:text-[10px] font-mono text-[#8b949e] uppercase tracking-widest mb-1 sm:mb-2 font-black">Recent Projects</h6>
               {stats.recentRepos.slice(0, 4).map((repo, i) => (
-                <div key={i} className="p-8 rounded-2xl bg-white/5 border border-white/5 flex flex-col hover:border-white/20 transition-colors">
-                  <h6 className="text-xl font-black text-white mb-3 truncate">{repo.name}</h6>
-                  <p className="text-[13px] text-[#8b949e] line-clamp-2 mb-6 italic leading-relaxed">{repo.description}</p>
+                <div key={i} className="p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5 flex flex-col hover:border-white/20 transition-colors">
+                  <h6 className="text-base sm:text-lg md:text-xl font-black text-white mb-2 sm:mb-3 truncate">{repo.name}</h6>
+                  <p className="text-[11px] sm:text-xs md:text-[13px] text-[#8b949e] line-clamp-2 mb-4 sm:mb-6 italic leading-relaxed">{repo.description}</p>
                   <div className="mt-auto flex justify-between items-center">
-                    <span className="text-[11px] font-mono text-white/40 uppercase tracking-widest">{repo.language}</span>
-                    <span className="text-[11px] font-mono text-[#d29922] font-black">★ {repo.stars}</span>
+                    <span className="text-[9px] sm:text-[11px] font-mono text-white/40 uppercase tracking-widest">{repo.language}</span>
+                    <span className="text-[9px] sm:text-[11px] font-mono text-[#d29922] font-black">★ {repo.stars}</span>
                   </div>
                 </div>
               ))}
@@ -458,12 +458,12 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </section>
 
         {/* Monthly Activity Section - Mobile Optimized */}
-        <section className="mb-16 md:mb-24 px-2 md:px-0">
-          <h5 className="text-sm md:text-base font-mono text-[#8b949e] uppercase tracking-[0.3em] md:tracking-[0.5em] mb-6 md:mb-8 font-black text-center">2025 Monthly Activity</h5>
+        <section className="mb-8 sm:mb-12 md:mb-16 lg:mb-24 px-2 md:px-0">
+          <h5 className="text-xs sm:text-sm md:text-base font-mono text-[#8b949e] uppercase tracking-[0.3em] md:tracking-[0.5em] mb-3 sm:mb-6 md:mb-8 font-black text-center">{stats.analysisYear ?? 2025} Monthly Activity</h5>
           
           {/* Disclaimer */}
-          <div className="mb-6 md:mb-8 text-center px-4">
-            <p className="text-[10px] md:text-xs font-mono text-[#6e7681] italic max-w-2xl mx-auto leading-relaxed">
+          <div className="mb-3 sm:mb-6 md:mb-8 text-center px-2 sm:px-4">
+            <p className="text-[9px] sm:text-[10px] md:text-xs font-mono text-[#6e7681] italic max-w-2xl mx-auto leading-relaxed">
               ⚠️ Limited to public events from GitHub's API (~90 days). Actual GitHub contribution count may be higher due to private repos and older activity.
             </p>
           </div>
@@ -559,13 +559,13 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         </section>
 
         {/* Footer */}
-        <section className="mt-20 pt-16 border-t border-[#30363d]/50">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
-            <div className="space-y-4">
-              <h5 className="text-[11px] font-mono text-white/40 uppercase tracking-[0.5em] font-black">Reported by DevWrapped</h5>
+        <section className="mt-10 sm:mt-14 md:mt-20 pt-8 sm:pt-12 md:pt-16 border-t border-[#30363d]/50">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8 md:gap-12">
+            <div className="space-y-2 sm:space-y-4">
+              <h5 className="text-[9px] sm:text-[11px] font-mono text-white/40 uppercase tracking-[0.4em] sm:tracking-[0.5em] font-black">Reported by DevWrapped</h5>
               <div className="space-y-1">
-                <p className="text-2xl font-display font-black text-white">Somesh Bhardwaj</p>
-                <div className="flex gap-5">
+                <p className="text-lg sm:text-xl md:text-2xl font-display font-black text-white">Somesh Bhardwaj</p>
+                <div className="flex gap-3 sm:gap-5">
                   <a 
                     href="https://github.com/Dev-Somesh" 
                     target="_blank" 
@@ -580,7 +580,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                         page_url: window.location.href
                       });
                     }}
-                    className="text-sm text-[#39d353] hover:underline font-mono"
+                    className="text-xs sm:text-sm text-[#39d353] hover:underline font-mono"
                   >
                     GitHub
                   </a>
@@ -598,7 +598,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                         page_url: window.location.href
                       });
                     }}
-                    className="text-sm text-[#58a6ff] hover:underline font-mono"
+                    className="text-xs sm:text-sm text-[#58a6ff] hover:underline font-mono"
                   >
                     LinkedIn
                   </a>
@@ -616,26 +616,26 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                         page_url: window.location.href
                       });
                     }}
-                    className="text-sm text-purple-400 hover:underline font-mono"
+                    className="text-xs sm:text-sm text-purple-400 hover:underline font-mono"
                   >
                     Portfolio
                   </a>
                 </div>
               </div>
             </div>
-            <div className="md:text-right space-y-2">
-              <p className="text-[11px] font-mono text-white/40 uppercase tracking-widest">Inquiries & Feedback</p>
-              <a href="mailto:hello@someshbhardwaj.me" className="text-lg text-white hover:text-[#39d353] transition-colors font-mono font-medium">hello@someshbhardwaj.me</a>
+            <div className="md:text-right space-y-1 sm:space-y-2">
+              <p className="text-[9px] sm:text-[11px] font-mono text-white/40 uppercase tracking-widest">Inquiries & Feedback</p>
+              <a href="mailto:hello@someshbhardwaj.me" className="text-sm sm:text-base md:text-lg text-white hover:text-[#39d353] transition-colors font-mono font-medium">hello@someshbhardwaj.me</a>
             </div>
           </div>
         </section>
 
-        <div className="mt-16 pt-12 border-t border-[#30363d]/30 flex flex-col md:flex-row justify-between items-center gap-8 opacity-20">
-           <div className="flex items-center gap-4">
-             <svg height="28" viewBox="0 0 16 16" width="28" fill="white"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
-             <span className="text-[12px] font-mono tracking-[1em] font-black uppercase">DEVWRAPPED // 2025</span>
+        <div className="mt-8 sm:mt-12 md:mt-16 pt-6 sm:pt-8 md:pt-12 border-t border-[#30363d]/30 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-8 opacity-20">
+           <div className="flex items-center gap-2 sm:gap-4">
+             <svg className="w-5 h-5 sm:w-7 sm:h-7" viewBox="0 0 16 16" fill="white"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+             <span className="text-[10px] sm:text-[12px] font-mono tracking-[0.5em] sm:tracking-[1em] font-black uppercase">DEVWRAPPED // {stats.analysisYear ?? 2025}</span>
            </div>
-           <div className="font-mono text-[10px] uppercase tracking-widest text-right">
+           <div className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-right">
              <p>SYSTEM_REPORT_GEN_SUCCESS</p>
              <p>ENCRYPTION_LAYER_ACTIVE</p>
              <p>TRACED_BY_SOMESH_BHARDWAJ</p>
