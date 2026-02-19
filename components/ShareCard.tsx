@@ -147,50 +147,54 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
   const downloadImage = async () => {
     if (!cardRef.current) return;
     setIsExporting(true);
-    
+
     // Track export attempt with Mixpanel
     trackEvent('Share Card Export Started', {
       user_id: stats.username,
       archetype: insights.archetype,
       page_url: window.location.href
     });
-    
-    // Track export attempt with Microsoft Clarity
+
     if (typeof window !== 'undefined' && (window as any).clarity) {
       (window as any).clarity('event', 'share_card_export_started', {
         username: stats.username,
         archetype: insights.archetype
       });
     }
-    
+
     try {
-      const originalTransform = cardRef.current.style.transform;
-      cardRef.current.style.transform = 'none';
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const dataUrl = await toPng(cardRef.current, { 
+      // Clone the card and render it on-screen inside an overlay so the browser paints it
+      // (off-screen clones often render blank)
+      const node = cardRef.current;
+      const clone = node.cloneNode(true) as HTMLElement;
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:#0d1117;z-index:9998;';
+      clone.style.cssText = 'position:absolute;left:0;top:0;width:480px;height:740px;transform:none;';
+      overlay.appendChild(clone);
+      document.body.appendChild(overlay);
+
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      const dataUrl = await toPng(clone, {
         cacheBust: true,
         pixelRatio: 4,
         backgroundColor: '#0d1117',
         quality: 1,
       });
-      
-      cardRef.current.style.transform = originalTransform;
+
+      overlay.remove();
 
       const link = document.createElement('a');
       link.download = `devwrapped-${stats.analysisYear ?? 2025}-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
-      
-      // Track successful export with Mixpanel
+
       trackEvent('Share Card Export Success', {
         user_id: stats.username,
         archetype: insights.archetype,
         page_url: window.location.href
       });
-      
-      // Track successful export
+
       if (typeof window !== 'undefined' && (window as any).clarity) {
         (window as any).clarity('event', 'share_card_export_success', {
           username: stats.username,
@@ -199,16 +203,14 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       }
     } catch (err) {
       console.error('Export failed:', err);
-      
-      // Track export failure with Mixpanel
+
       trackEvent('Error', {
         error_type: 'Export',
         error_message: err instanceof Error ? err.message : 'Unknown error',
         page_url: window.location.href,
         user_id: stats.username
       });
-      
-      // Track export failure
+
       if (typeof window !== 'undefined' && (window as any).clarity) {
         (window as any).clarity('event', 'share_card_export_failed', {
           username: stats.username,
