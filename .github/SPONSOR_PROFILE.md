@@ -145,10 +145,10 @@ Hi! I'm **Somesh Bhardwaj**, the creator of DevWrapped 2025. As a full-stack dev
 ## 📞 Get in Touch
 
 ### 💬 **Let's Connect:**
-- **Email**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **GitHub**: [@Dev-Somesh](https://github.com/Dev-Somesh)
 - **LinkedIn**: [Somesh Bhardwaj](https://www.linkedin.com/in/ersomeshbhardwaj/)
-- **Portfolio**: [someshbhardwaj.me](https://someshbhardwaj.me)
+- **Portfolio**: [www.someshbhardwaj.dev](https://www.someshbhardwaj.dev)
 
 ### 🤔 **Questions About Sponsoring?**
 - How will my contribution be used?

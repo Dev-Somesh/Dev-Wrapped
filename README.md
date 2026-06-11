@@ -158,8 +158,8 @@ Traffic (views/clones) is archived daily via [GitHub Actions](.github/workflows/
 ## ◈ SUPPORT & FEEDBACK
 - **Complete Documentation**: [DOCUMENTATION.md](./DOCUMENTATION.md)
 - **Issues & Bugs**: GitHub Issues
-- **Direct Support**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
-- **Portfolio**: [someshbhardwaj.me](https://someshbhardwaj.me)
+- **Direct Support**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
+- **Portfolio**: [www.someshbhardwaj.dev](https://www.someshbhardwaj.dev)
 
 ## 💖 Support This Project
 
@@ -203,12 +203,12 @@ DevWrapped 2025 is powered by incredible technologies and services:
 
 <p align="center">
   <br />
-  <b>ARCHITECTED BY <a href="https://someshbhardwaj.me">SOMESH BHARDWAJ</a></b><br />
+  <b>ARCHITECTED BY <a href="https://www.someshbhardwaj.dev">SOMESH BHARDWAJ</a></b><br />
   <span style="opacity: 0.3; font-family: monospace; font-size: 10px; letter-spacing: 5px;">*** END_OF_MANIFEST_2025 ***</span>
 </p>
 
 <p align="center">
-  <a href="https://someshbhardwaj.me">
+  <a href="https://www.someshbhardwaj.dev">
     <img src="https://img.shields.io/badge/PORTFOLIO-000000?style=for-the-badge&logo=buffer&logoColor=white" />
   </a>
   <a href="https://www.linkedin.com/in/ersomeshbhardwaj/">

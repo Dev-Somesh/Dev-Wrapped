@@ -608,7 +608,7 @@ We recognize all types of contributions:
 
 - **GitHub Issues**: For bugs and feature requests
 - **GitHub Discussions**: For questions and ideas
-- **Email**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **Documentation**: [DOCUMENTATION.md](./DOCUMENTATION.md)
 
 ### 💬 Community Guidelines

@@ -1017,7 +1017,7 @@ const measureAPIPerformance = async (username: string) => {
   <h3>🎉 API Documentation Complete!</h3>
   <p><em>Everything you need to integrate with DevWrapped 2025 APIs</em></p>
   
-  **Need help?** Contact [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+  **Need help?** Contact [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 </div>
 
 ---

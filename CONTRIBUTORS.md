@@ -25,7 +25,7 @@
 - 📚 **Documentation**: Comprehensive documentation and guides
 - 🔒 **Security & Privacy**: Privacy-first architecture and security implementation
 
-**Contact**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me) | [Portfolio](https://someshbhardwaj.me) | [LinkedIn](https://www.linkedin.com/in/ersomeshbhardwaj/)
+**Contact**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev) | [Portfolio](https://www.someshbhardwaj.dev) | [LinkedIn](https://www.linkedin.com/in/ersomeshbhardwaj/)
 
 ---
 
@@ -185,10 +185,10 @@ Contributors are recognized in:
 ## 📞 Contact for Contributors
 
 ### 🤝 **Maintainer Contact**
-- **Email**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **GitHub**: [@Dev-Somesh](https://github.com/Dev-Somesh)
 - **LinkedIn**: [ersomeshbhardwaj](https://www.linkedin.com/in/ersomeshbhardwaj/)
-- **Portfolio**: [someshbhardwaj.me](https://someshbhardwaj.me)
+- **Portfolio**: [www.someshbhardwaj.dev](https://www.someshbhardwaj.dev)
 
 ### 💬 **Community Channels**
 - **GitHub Issues**: For bug reports and feature requests

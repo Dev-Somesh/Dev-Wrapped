@@ -4,7 +4,7 @@
 # TEAM
 
     Developer & Designer: Somesh Bhardwaj
-    Contact: hello [at] someshbhardwaj.me
+    Contact: hello [at] someshbhardwaj.dev
     Twitter: @someshbhardwaj
     GitHub: @Dev-Somesh
     LinkedIn: /in/ersomeshbhardwaj

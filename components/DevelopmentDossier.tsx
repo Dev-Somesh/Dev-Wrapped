@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import { GitHubStats, AIInsights } from '../types';
 import { trackEvent } from '../services/mixpanelService';
+import { getFallbackYear } from '../utils/dateUtils';
 
 interface DevelopmentDossierProps {
   stats: GitHubStats;
@@ -33,14 +34,14 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
       // Highlight usernames (with @ symbol and without)
       .replace(/@(\w+)/g, '<span class="text-[#39d353] font-semibold not-italic">@$1</span>')
       .replace(new RegExp(`\\b${stats.username}\\b`, 'gi'), '<span class="text-[#39d353] font-semibold not-italic">$&</span>')
-      // Highlight numbers with units (contributions, days, streak, etc.)
-      .replace(/(\d+)\s+(day|days|contribution|contributions|repo|repos|language|languages|commit|commits|star|stars)/gi, '<span class="text-[#39d353] font-semibold not-italic">$1 $2</span>')
-      // Highlight programming languages and technologies
-      .replace(/(JavaScript|TypeScript|Python|React|Node\.js|HTML|CSS|Java|C\+\+|Go|Rust|PHP|Ruby|Swift|Kotlin|Vue|Angular|Docker|Git)/gi, '<span class="text-[#39d353] font-semibold not-italic">$1</span>')
-      // Highlight key development terms
-      .replace(/(streak|pattern|consistency|rhythm|milestone|journey|wrapped|archetype|developer|coding|programming|repository|commit|merge|pull request)/gi, '<span class="text-[#39d353] font-semibold not-italic">$1</span>')
-      // Highlight months
-      .replace(/(January|February|March|April|May|June|July|August|September|October|November|December)/gi, '<span class="text-[#39d353] font-semibold not-italic">$1</span>')
+      // Highlight numbers with units; longest alternatives first so plurals like "repositories" highlight fully
+      .replace(/(\d+)\s+(contributions?|repositor(?:ies|y)|repos?|languages?|commits?|stars?|streaks?|days?)\b/gi, '<span class="text-[#39d353] font-semibold not-italic">$1 $2</span>')
+      // Highlight programming languages and technologies (word-bounded so "Git" doesn't match inside "digital")
+      .replace(/\b(?:JavaScript|TypeScript|Node\.js|Python|React|HTML|CSS|Java|Go|Rust|PHP|Ruby|Swift|Kotlin|Vue|Angular|Docker|Git)\b|C\+\+/gi, '<span class="text-[#39d353] font-semibold not-italic">$&</span>')
+      // Highlight key development terms, including plural forms
+      .replace(/\b(streaks?|patterns?|consistency|rhythms?|milestones?|journeys?|wrapped|archetypes?|developers?|coding|programming|repositor(?:ies|y)|commits?|merges?|pull requests?)\b/gi, '<span class="text-[#39d353] font-semibold not-italic">$&</span>')
+      // Highlight months (word-bounded so "May" doesn't match inside "Maybe")
+      .replace(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/gi, '<span class="text-[#39d353] font-semibold not-italic">$1</span>')
       // Convert line breaks to proper HTML paragraphs
       .replace(/\n\n/g, '</p><p class="mb-6">')
       .replace(/\n/g, '<br/>');
@@ -75,7 +76,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         }
       });
       const link = document.createElement('a');
-      link.download = `dev-dossier-${stats.analysisYear ?? 2025}-${stats.username}.png`;
+      link.download = `dev-dossier-${stats.analysisYear ?? getFallbackYear()}-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
       
@@ -123,7 +124,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 md:mb-10 lg:mb-12 gap-3 sm:gap-6 md:gap-0">
         <div className="space-y-1 sm:space-y-2 text-center md:text-left w-full md:w-auto">
           <h3 className="text-xl sm:text-2xl md:text-4xl font-display font-black text-white tracking-tighter uppercase">Intelligence Dossier</h3>
-          <p className="text-[#8b949e] font-light italic text-sm sm:text-base md:text-lg">Comprehensive analysis of the {stats.analysisYear ?? 2025} development cycle.</p>
+          <p className="text-[#8b949e] font-light italic text-sm sm:text-base md:text-lg">Comprehensive analysis of the {stats.analysisYear ?? getFallbackYear()} development cycle.</p>
         </div>
         <button 
           onClick={exportFullReport}
@@ -459,7 +460,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
 
         {/* Monthly Activity Section - Mobile Optimized */}
         <section className="mb-8 sm:mb-12 md:mb-16 lg:mb-24 px-2 md:px-0">
-          <h5 className="text-xs sm:text-sm md:text-base font-mono text-[#8b949e] uppercase tracking-[0.3em] md:tracking-[0.5em] mb-3 sm:mb-6 md:mb-8 font-black text-center">{stats.analysisYear ?? 2025} Monthly Activity</h5>
+          <h5 className="text-xs sm:text-sm md:text-base font-mono text-[#8b949e] uppercase tracking-[0.3em] md:tracking-[0.5em] mb-3 sm:mb-6 md:mb-8 font-black text-center">{stats.analysisYear ?? getFallbackYear()} Monthly Activity</h5>
           
           {/* Disclaimer */}
           <div className="mb-3 sm:mb-6 md:mb-8 text-center px-2 sm:px-4">
@@ -603,13 +604,13 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
                     LinkedIn
                   </a>
                   <a 
-                    href="https://someshbhardwaj.me" 
+                    href="https://www.someshbhardwaj.dev" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     onClick={() => {
                       trackEvent('External Link Clicked', {
                         link_type: 'portfolio_dossier',
-                        destination: 'someshbhardwaj.me',
+                        destination: 'www.someshbhardwaj.dev',
                         action: 'view_portfolio',
                         context: 'development_dossier',
                         user_id: stats.username,
@@ -625,7 +626,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
             </div>
             <div className="md:text-right space-y-1 sm:space-y-2">
               <p className="text-[9px] sm:text-[11px] font-mono text-white/40 uppercase tracking-widest">Inquiries & Feedback</p>
-              <a href="mailto:hello@someshbhardwaj.me" className="text-sm sm:text-base md:text-lg text-white hover:text-[#39d353] transition-colors font-mono font-medium">hello@someshbhardwaj.me</a>
+              <a href="mailto:hello@someshbhardwaj.dev" className="text-sm sm:text-base md:text-lg text-white hover:text-[#39d353] transition-colors font-mono font-medium">hello@someshbhardwaj.dev</a>
             </div>
           </div>
         </section>
@@ -633,7 +634,7 @@ const DevelopmentDossier: React.FC<DevelopmentDossierProps> = ({ stats, insights
         <div className="mt-8 sm:mt-12 md:mt-16 pt-6 sm:pt-8 md:pt-12 border-t border-[#30363d]/30 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-8 opacity-20">
            <div className="flex items-center gap-2 sm:gap-4">
              <svg className="w-5 h-5 sm:w-7 sm:h-7" viewBox="0 0 16 16" fill="white"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
-             <span className="text-[10px] sm:text-[12px] font-mono tracking-[0.5em] sm:tracking-[1em] font-black uppercase">DEVWRAPPED // {stats.analysisYear ?? 2025}</span>
+             <span className="text-[10px] sm:text-[12px] font-mono tracking-[0.5em] sm:tracking-[1em] font-black uppercase">DEVWRAPPED // {stats.analysisYear ?? getFallbackYear()}</span>
            </div>
            <div className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-right">
              <p>SYSTEM_REPORT_GEN_SUCCESS</p>

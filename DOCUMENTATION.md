@@ -759,13 +759,13 @@ console.log('Contribution Stats:', stats);
 
 ### 🆘 Getting Help
 - **GitHub Issues**: For bugs and feature requests
-- **Email Support**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email Support**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **Documentation**: This comprehensive guide
 - **Community**: GitHub Discussions (if enabled)
 
 ### 👨‍💻 About the Developer
 **Somesh Bhardwaj** - Full Stack Developer & AI Enthusiast
-- **Portfolio**: [someshbhardwaj.me](https://someshbhardwaj.me)
+- **Portfolio**: [www.someshbhardwaj.dev](https://www.someshbhardwaj.dev)
 - **GitHub**: [@Dev-Somesh](https://github.com/Dev-Somesh)
 - **LinkedIn**: [ersomeshbhardwaj](https://www.linkedin.com/in/ersomeshbhardwaj/)
 

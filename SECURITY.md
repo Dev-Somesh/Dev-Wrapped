@@ -6,7 +6,7 @@ We take the security of DevWrapped 2025 seriously. If you discover a security vu
 
 ### 📧 How to Report
 
-- **Email**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **GitHub**: [Create a security advisory](https://github.com/Dev-Somesh/Dev-Wrapped/security/advisories/new)
 - **Subject**: "Security Vulnerability - DevWrapped 2025"
 
@@ -145,7 +145,7 @@ Security researchers who responsibly disclose vulnerabilities will be:
 
 ### 🆘 Security Team
 - **Lead**: Somesh Bhardwaj
-- **Email**: [hello@someshbhardwaj.me](mailto:hello@someshbhardwaj.me)
+- **Email**: [hello@someshbhardwaj.dev](mailto:hello@someshbhardwaj.dev)
 - **GitHub**: [@Dev-Somesh](https://github.com/Dev-Somesh)
 - **Response Time**: 24 hours maximum
 
