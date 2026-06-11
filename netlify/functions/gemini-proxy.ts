@@ -33,9 +33,7 @@ export const handler: Handler = async (event, context) => {
 
   // Get API key from environment variable (set in Netlify)
   const apiKey = process.env.GEMINI_API_KEY;
-  console.log('Gemini proxy: API key present:', !!apiKey);
-  console.log('Gemini proxy: API key length:', apiKey?.length || 0);
-  
+
   if (!apiKey) {
     return {
       statusCode: 500,

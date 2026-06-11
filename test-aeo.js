@@ -8,9 +8,9 @@ const testAEO = async () => {
   const yearAvailability = calculateYearAvailability();
   console.log('📅 Year Selection Test:', {
     currentYear: yearAvailability.currentYear,
-    canShowYearSelection: yearAvailability.canShowYearSelection,
+    defaultYear: yearAvailability.defaultYear,
     availableYears: yearAvailability.availableYears,
-    dataLimitation: yearAvailability.dataLimitation
+    previousYear: yearAvailability.previousYear
   });
   
   // Test 2: Monitor console for AEO logs during analysis

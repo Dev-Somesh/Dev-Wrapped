@@ -3,8 +3,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Step, GitHubStats, AIInsights } from './types';
 import { fetchGitHubData } from './services/githubService';
 import { generateAIWrapped } from './services/geminiService';
+import { generateFallbackInsights } from './services/fallbackInsights';
 import { logDiagnosticData } from './services/security';
 import { trackEvent, identifyUser, trackTimeOnPage, trackScrollDepth, trackSessionStart, trackSessionEnd } from './services/mixpanelService';
+import { calculateYearAvailability } from './utils/dateUtils';
 import Landing from './components/Landing';
 import Loading from './components/Loading';
 // Intermediate step components removed for streamlined flow
@@ -61,6 +63,10 @@ const App: React.FC = () => {
   const [step, setStep] = useState<Step>(Step.Entry);
   const [stats, setStats] = useState<GitHubStats | null>(null);
   const [insights, setInsights] = useState<AIInsights | null>(null);
+  // Per-year cache so switching years on the Share page doesn't refetch
+  const [yearData, setYearData] = useState<Record<number, { stats: GitHubStats; insights: AIInsights }>>({});
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const availableYears = useMemo(() => calculateYearAvailability().availableYears, []);
   const [error, setError] = useState<string | null>(null);
   const [activeModel] = useState("gemini-3-flash-preview");
   const [showCredits, setShowCredits] = useState(false);
@@ -122,6 +128,27 @@ const App: React.FC = () => {
 
   const startAnalysis = async (user: string, selectedYear?: number) => {
     const analysisYear = selectedYear || new Date().getFullYear();
+
+    // New username invalidates the previous user's cached years
+    const isNewUser = user !== currentUser;
+    if (isNewUser) setYearData({});
+    setCurrentUser(user);
+
+    // Serve a previously analyzed year instantly from cache
+    const cached = !isNewUser ? yearData[analysisYear] : undefined;
+    if (cached) {
+      setStats(cached.stats);
+      setInsights(cached.insights);
+      setError(null);
+      setStep(Step.Share);
+      trackEvent('Year Served From Cache', {
+        user_id: user,
+        selected_year: analysisYear,
+        page_url: window.location.href
+      });
+      return;
+    }
+
     setStep(Step.Analysis);
     setError(null);
     
@@ -151,9 +178,36 @@ const App: React.FC = () => {
     try {
       const fetchedStats = await fetchGitHubData(user, analysisYear);
       setStats(fetchedStats);
-      
-      const fetchedInsights = await generateAIWrapped(fetchedStats, activeModel);
+
+      // Gemini failure is non-fatal: retry transient errors once, then fall
+      // back to a rule-based summary built from the GitHub stats we already have.
+      let fetchedInsights: AIInsights;
+      try {
+        fetchedInsights = await generateAIWrapped(fetchedStats, activeModel);
+      } catch (aiErr: any) {
+        const isTransient = /RATE_LIMIT|NETWORK_ERROR|INTERNAL_ERROR|NULL_TRACE/.test(aiErr?.message || '');
+        if (isTransient) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+        try {
+          fetchedInsights = isTransient
+            ? await generateAIWrapped(fetchedStats, activeModel)
+            : generateFallbackInsights(fetchedStats);
+        } catch {
+          fetchedInsights = generateFallbackInsights(fetchedStats);
+        }
+        if (fetchedInsights.source === 'local') {
+          trackEvent('AI Fallback Used', {
+            user_id: user,
+            error_message: aiErr?.message || 'Unknown Gemini error',
+            page_url: window.location.href,
+            model_used: activeModel
+          });
+          logDiagnosticData(aiErr, { username: user, step: 'AI_FALLBACK', model: activeModel });
+        }
+      }
       setInsights(fetchedInsights);
+      setYearData(prev => ({ ...prev, [analysisYear]: { stats: fetchedStats, insights: fetchedInsights } }));
 
       // Track AI Response Sent
       trackEvent('AI Response Sent', {
@@ -251,6 +305,19 @@ const App: React.FC = () => {
     }
   };
 
+  const switchYear = (year: number) => {
+    if (!currentUser || year === stats?.analysisYear) return;
+    trackEvent('Year Switched', {
+      user_id: currentUser,
+      from_year: stats?.analysisYear,
+      to_year: year,
+      served_from_cache: Boolean(yearData[year]),
+      page_url: window.location.href
+    });
+    // Cached years render instantly; uncached ones run the full analysis flow
+    startAnalysis(currentUser, year);
+  };
+
   const renderStep = () => {
     switch (step) {
       case Step.Entry: return <Landing onConnect={startAnalysis} error={error} onOpenCredits={() => setShowCredits(true)} />;
@@ -263,6 +330,36 @@ const App: React.FC = () => {
       // case Step.Archetype: return insights && <ArchetypeReveal insights={insights} onNext={nextStep} onBack={prevStep} />;
       case Step.Share: return stats && insights && (
         <div className="w-full min-w-0 flex flex-col items-center pt-3 sm:pt-6 md:pt-10 lg:pt-12 pb-16 sm:pb-20 md:pb-24 overflow-x-hidden safe-x" style={{ paddingBottom: 'max(4rem, calc(1rem + env(safe-area-inset-bottom)))' }}>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+            <span className="text-[8px] sm:text-[10px] font-mono text-[#484f58] uppercase tracking-wider font-black mr-1">Year</span>
+            {availableYears.map((year) => {
+              const isActive = year === stats.analysisYear;
+              const isCached = Boolean(yearData[year]);
+              return (
+                <button
+                  key={year}
+                  type="button"
+                  onClick={() => switchYear(year)}
+                  title={isCached ? `${year} (loaded)` : `Analyze ${year}`}
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border font-mono text-[10px] sm:text-xs font-bold transition-all ${
+                    isActive
+                      ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]'
+                      : isCached
+                        ? 'bg-[#0d1117] border-[#30363d] text-[#c9d1d9] hover:border-[#39d353]/50'
+                        : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:border-[#39d353]/50'
+                  }`}
+                >
+                  {year}{isCached && !isActive ? ' •' : ''}
+                </button>
+              );
+            })}
+          </div>
+          {insights.source === 'local' && (
+            <div className="w-full max-w-2xl mb-3 sm:mb-4 px-3 py-2 rounded-lg bg-[#bb8009]/10 border border-[#bb8009]/40 text-[#d29922] text-[10px] sm:text-xs font-mono flex items-center gap-2">
+              <span className="font-black flex-shrink-0">⚠</span>
+              <span>AI insights are temporarily unavailable — showing a stats-based summary built from your real GitHub data.</span>
+            </div>
+          )}
           <ShareCard stats={stats} insights={insights} onReset={() => setStep(Step.Entry)} />
           <DevelopmentDossier stats={stats} insights={insights} />
         </div>
@@ -474,13 +571,13 @@ const App: React.FC = () => {
               <h4 className="text-[#f0f6fc] font-mono font-bold text-[10px] mb-2 uppercase tracking-wider">Developer</h4>
               <div className="space-y-1.5">
                 <a
-                  href="https://someshbhardwaj.me"
+                  href="https://www.someshbhardwaj.dev"
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => {
                     trackEvent('External Link Clicked', {
                       link_type: 'portfolio',
-                      destination: 'someshbhardwaj.me',
+                      destination: 'www.someshbhardwaj.dev',
                       action: 'view_portfolio',
                       page_url: window.location.href
                     });

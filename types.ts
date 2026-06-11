@@ -16,7 +16,7 @@ export interface GitHubStats {
   topLanguages: { name: string; count: number }[];
   allLanguages: { name: string; count: number }[]; // New: All languages used
   reposContributed: number;
-  reposCreatedThisYear: number; // New field for repos created in 2024/2025
+  reposCreatedThisYear: number;
   recentRepos: GitHubRepo[];
   streak: number;
   longestStreak?: number; // New: Longest streak for comparison
@@ -38,6 +38,7 @@ export interface GitHubStats {
 }
 
 export interface AIInsights {
+  source?: 'ai' | 'local'; // 'local' = rule-based fallback when Gemini is unavailable
   archetype: string;
   archetypeDescription: string;
   archetypeExplanation: {

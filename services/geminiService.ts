@@ -48,7 +48,7 @@ export const generateAIWrapped = async (stats: GitHubStats, modelName: string = 
       throw new Error('GEMINI_NULL_TRACE: The intelligence core returned an invalid response.');
     }
     
-    return data as AIInsights;
+    return { ...data, source: 'ai' } as AIInsights;
   } catch (error: any) {
     // Re-throw if it's already a properly formatted error
     if (error.message && error.message.startsWith('GEMINI_')) {

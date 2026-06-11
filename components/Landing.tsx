@@ -19,38 +19,23 @@ const YearBanner: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate days since January 1, 2026
-  const startOf2026 = new Date('2026-01-01T00:00:00');
-  const startOf2027 = new Date('2027-01-01T00:00:00');
-  
-  const daysSince2026Start = Math.floor((currentTime.getTime() - startOf2026.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  
-  // Check if we're in 2026 or later
-  const isIn2026 = currentTime < startOf2027;
   const currentYear = currentTime.getFullYear();
-  const currentMonth = currentTime.getMonth() + 1; // 1-based month
-  
+  const previousYear = currentYear - 1;
+  const yearStart = new Date(currentYear, 0, 1);
+  const dayOfYear = Math.floor((currentTime.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const currentMonth = currentTime.getMonth() + 1;
+
   let displayText = '';
-  
-  if (isIn2026) {
-    // Special New Year messaging for January
-    if (currentMonth === 1) {
-      if (daysSince2026Start === 1) {
-        displayText = `🎉 Happy New Year! Day 1 of 2026 • Perfect time to review 2025!`;
-      } else if (daysSince2026Start <= 7) {
-        displayText = `🎊 New Year Week! Day ${daysSince2026Start} of 2026 • Reflect on your 2025 journey`;
-      } else if (daysSince2026Start <= 31) {
-        displayText = `✨ New Year Vibes! Day ${daysSince2026Start} of 2026 • Celebrate your 2025 achievements`;
-      }
+  if (currentMonth === 1 && dayOfYear <= 31) {
+    if (dayOfYear === 1) {
+      displayText = `🎉 Happy New Year! Day 1 of ${currentYear} • Perfect time to review ${previousYear}!`;
+    } else if (dayOfYear <= 7) {
+      displayText = `🎊 New Year Week! Day ${dayOfYear} of ${currentYear} • Reflect on your ${previousYear} journey`;
     } else {
-      // Regular messaging for rest of the year
-      displayText = `Day ${daysSince2026Start} of 2026 • Keep building your legacy`;
+      displayText = `✨ New Year Vibes! Day ${dayOfYear} of ${currentYear} • Celebrate your ${previousYear} achievements`;
     }
   } else {
-    // We're in 2027 or later
-    const currentYearStart = new Date(`${currentYear}-01-01T00:00:00`);
-    const daysSinceYearStart = Math.floor((currentTime.getTime() - currentYearStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    displayText = `Day ${daysSinceYearStart} of ${currentYear} • Your development journey evolves`;
+    displayText = `Day ${dayOfYear} of ${currentYear} • Wrap ${previousYear} or track ${currentYear} progress`;
   }
 
   return (
@@ -58,56 +43,6 @@ const YearBanner: React.FC = () => {
       <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-400 rounded-full animate-pulse flex-shrink-0"></div>
       <span className="text-[9px] sm:text-[10px] md:text-sm font-mono text-green-200 uppercase tracking-wider font-black text-center leading-tight">
         {displayText}
-      </span>
-    </div>
-  );
-};
-
-const UserCounter: React.FC = () => {
-  const [userCount, setUserCount] = useState(0);
-  
-  useEffect(() => {
-    // Generate a realistic random number between 18,000 and 25,000
-    const baseCount = 19247; // Starting number
-    const randomVariation = Math.floor(Math.random() * 4000); // Add 0-4000
-    const initialCount = baseCount + randomVariation;
-    
-    // Animate the counter to initial value
-    let current = 0;
-    const increment = initialCount / 100;
-    const initialTimer = setInterval(() => {
-      current += increment;
-      if (current >= initialCount) {
-        setUserCount(initialCount);
-        clearInterval(initialTimer);
-        
-        // Start auto-increment after initial animation
-        const autoIncrement = setInterval(() => {
-          setUserCount(prev => {
-            // Randomly increment by 1-3 every 8-15 seconds
-            const shouldIncrement = Math.random() < 0.7; // 70% chance
-            if (shouldIncrement) {
-              const incrementBy = Math.floor(Math.random() * 3) + 1; // 1-3
-              return prev + incrementBy;
-            }
-            return prev;
-          });
-        }, Math.random() * 7000 + 8000); // 8-15 seconds
-        
-        return () => clearInterval(autoIncrement);
-      } else {
-        setUserCount(Math.floor(current));
-      }
-    }, 20);
-
-    return () => clearInterval(initialTimer);
-  }, []);
-
-  return (
-    <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full backdrop-blur-sm">
-      <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-      <span className="text-[9px] md:text-[10px] font-mono text-green-300 uppercase tracking-wider font-black">
-        {userCount.toLocaleString()}+ Developers Wrapped
       </span>
     </div>
   );
@@ -186,12 +121,11 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
   // Calculate year availability based on current date
   const yearAvailability = useMemo(() => calculateYearAvailability(), []);
   
-  // Set default year selection
   useEffect(() => {
     if (selectedYear === null) {
-      setSelectedYear(yearAvailability.currentYear);
+      setSelectedYear(yearAvailability.defaultYear);
     }
-  }, [yearAvailability.currentYear, selectedYear]);
+  }, [yearAvailability.defaultYear, selectedYear]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +135,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
         form_type: 'github_username',
         username: username.trim(),
         selected_year: selectedYear,
-        year_selection_available: yearAvailability.canShowYearSelection,
+        available_years: yearAvailability.availableYears,
         page_url: window.location.href
       });
       
@@ -380,13 +314,13 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
             </span>
           </div>
           <h1 className="text-[1.75rem] leading-[1.12] sm:text-3xl sm:leading-[1.08] md:text-4xl md:leading-[1.05] lg:text-5xl lg:leading-[0.95] xl:text-6xl xl:leading-[0.9] font-display font-black tracking-tighter text-[#f0f6fc] select-none break-words">
-            CELEBRATE<br />YOUR 2025<br />
+            CELEBRATE<br />YOUR {yearAvailability.defaultYear}<br />
             <span className="animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-[#39d353] via-[#58a6ff] to-[#bc8cff] drop-shadow-[0_0_40px_rgba(57,211,83,0.15)]">
               CODE JOURNEY.
             </span>
           </h1>
           <p className="text-[#8b949e] text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-light italic max-w-sm md:max-w-lg mx-auto leading-snug md:leading-relaxed opacity-70 px-0 sm:px-2">
-            New Year, New Reflections. Celebrate your incredible 2025 coding achievements with a beautiful year-in-review.
+            Your GitHub year-in-review — wrap {yearAvailability.previousYear} or track {yearAvailability.currentYear} progress with AI-powered insights.
           </p>
           
           <div className="mt-3 sm:mt-5 md:mt-10 lg:mt-12 max-w-2xl mx-auto">
@@ -447,58 +381,46 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
                 </p>
               </div>
 
-              {yearAvailability.canShowYearSelection && (
-                <div className="space-y-2 md:space-y-3 text-left">
-                  <label className="text-[8px] md:text-[10px] lg:text-xs font-mono text-[#484f58] uppercase tracking-wider ml-2 md:ml-4 font-black">Analysis Year</label>
-                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                    {yearAvailability.availableYears.map((year) => {
-                      const yearInfo = getYearDisplayInfo(year);
-                      return (
-                        <button
-                          key={year}
-                          type="button"
-                          onClick={() => {
-                            setSelectedYear(year);
-                            trackEvent('Year Selected', {
-                              selected_year: year,
-                              is_current_year: yearInfo.isCurrentYear,
-                              data_quality: yearInfo.dataQuality,
-                              page_url: window.location.href
-                            });
-                          }}
-                          className={`p-2.5 md:p-3 lg:p-4 rounded-lg md:rounded-xl border transition-all text-left ${
-                            selectedYear === year
-                              ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]'
-                              : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:border-[#39d353]/50'
-                          }`}
-                        >
-                          <div className="font-bold text-xs md:text-sm">{year}</div>
-                          <div className="text-[9px] md:text-[10px] opacity-70 mt-0.5 md:mt-1">
-                            {yearInfo.dataQuality === 'partial' && '📊 Partial data'}
-                            {yearInfo.dataQuality === 'mixed' && '🔀 Mixed data'}
-                            {yearInfo.dataQuality === 'full' && '✅ Full data'}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className="space-y-2 md:space-y-3 text-left">
+                <label className="text-[8px] md:text-[10px] lg:text-xs font-mono text-[#484f58] uppercase tracking-wider ml-2 md:ml-4 font-black">Analysis Year</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 md:gap-2">
+                  {yearAvailability.availableYears.map((year) => {
+                    const yearInfo = getYearDisplayInfo(year);
+                    return (
+                      <button
+                        key={year}
+                        type="button"
+                        onClick={() => {
+                          setSelectedYear(year);
+                          trackEvent('Year Selected', {
+                            selected_year: year,
+                            is_current_year: yearInfo.isCurrentYear,
+                            data_quality: yearInfo.dataQuality,
+                            page_url: window.location.href
+                          });
+                        }}
+                        className={`p-2.5 md:p-3 lg:p-4 rounded-lg md:rounded-xl border transition-all text-left ${
+                          selectedYear === year
+                            ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]'
+                            : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:border-[#39d353]/50'
+                        }`}
+                      >
+                        <div className="font-bold text-xs md:text-sm">{year}</div>
+                        <div className="text-[9px] md:text-[10px] opacity-70 mt-0.5 md:mt-1">
+                          {yearInfo.dataQuality === 'partial' && '📊 Partial data'}
+                          {yearInfo.dataQuality === 'estimated' && '🔍 Commit-based'}
+                          {yearInfo.dataQuality === 'full' && '✅ Full data'}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedYear && (
                   <p className="mt-1 ml-2 md:ml-4 text-[7px] md:text-[8px] lg:text-[9px] font-mono text-[#6e7681] leading-snug">
-                    ⚠️ {yearAvailability.dataLimitation}
+                    {getYearDisplayInfo(selectedYear).description}
                   </p>
-                </div>
-              )}
-
-              {yearAvailability.canShowCurrentYearOnly && (
-                <div className="space-y-1 md:space-y-2 text-left">
-                  <div className="p-2.5 md:p-3 lg:p-4 rounded-lg md:rounded-xl bg-[#d29922]/10 border border-[#d29922]/20 text-[#d29922]">
-                    <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold">
-                      <span>⚠️</span>
-                      <span>Data Limitation Notice</span>
-                    </div>
-                    <p className="text-[9px] md:text-[10px] mt-0.5 md:mt-1 opacity-80">{yearAvailability.dataLimitation}</p>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {error && (
                 <div className="p-3 md:p-4 rounded-lg md:rounded-xl bg-red-900/10 border border-red-500/20 text-red-400 text-[10px] md:text-xs animate-shake flex flex-col gap-1">
@@ -507,7 +429,7 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
                     <p className="font-medium">{error}</p>
                   </div>
                   <p className="pt-1 border-t border-red-500/10 text-[9px] md:text-[10px] opacity-70">
-                    Report to <a href="mailto:hello@someshbhardwaj.me" className="underline font-bold">hello@someshbhardwaj.me</a>
+                    Report to <a href="mailto:hello@someshbhardwaj.dev" className="underline font-bold">hello@someshbhardwaj.dev</a>
                   </p>
                 </div>
               )}
@@ -528,7 +450,6 @@ const Landing: React.FC<LandingProps> = ({ onConnect, error, onOpenCredits }) =>
             </form>
             
             <div className="mt-3 md:mt-4 flex justify-center">
-              <UserCounter />
             </div>
           </div>
         </div>

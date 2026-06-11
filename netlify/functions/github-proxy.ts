@@ -84,13 +84,18 @@ export const handler: Handler = async (event, context) => {
     // Replace username placeholder if present
     url = url.replace('{username}', username);
 
-    // Prepare headers for public API access
+    // Prepare headers for GitHub API access. GITHUB_TOKEN is optional but
+    // strongly recommended: unauthenticated calls share a 60 req/hour pool
+    // across ALL visitors (the function's IP), authenticated gets 5000/hour.
     const headers: Record<string, string> = {
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'DevWrapped-2025',
+      'User-Agent': 'DevWrapped',
     };
+    if (process.env.GITHUB_TOKEN) {
+      headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
 
-    console.log('GitHub proxy: Using public API access for', endpoint);
+    console.log(`GitHub proxy: Using ${process.env.GITHUB_TOKEN ? 'authenticated' : 'public'} API access for`, endpoint);
 
     // Create timeout controller
     const controller = createTimeoutController(GITHUB_API_TIMEOUT_MS);

@@ -4,6 +4,7 @@ import { toPng } from 'html-to-image';
 import { GitHubStats, AIInsights } from '../types';
 import { generateSecureTraceId } from '../services/security';
 import { trackEvent, trackFeatureEngagement } from '../services/mixpanelService';
+import { getFallbackYear } from '../utils/dateUtils';
 
 interface ShareCardProps {
   stats: GitHubStats;
@@ -185,7 +186,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
       overlay.remove();
 
       const link = document.createElement('a');
-      link.download = `devwrapped-${stats.analysisYear ?? 2025}-${stats.username}.png`;
+      link.download = `devwrapped-${stats.analysisYear ?? getFallbackYear()}-${stats.username}.png`;
       link.href = dataUrl;
       link.click();
 
@@ -341,7 +342,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
               <div className="flex justify-between items-start mb-4 relative z-20 flex-shrink-0">
                 <div className="flex flex-col">
                   <span className="text-[8px] font-mono text-[#8b949e] tracking-[0.3em] uppercase mb-1">DEV_WRAPPED</span>
-                  <span className="text-lg font-display font-black text-white tracking-tighter">{stats.analysisYear ?? 2025}</span>
+                  <span className="text-lg font-display font-black text-white tracking-tighter">{stats.analysisYear ?? getFallbackYear()}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
                   <img src={stats.avatarUrl} alt={stats.username} className="w-5 h-5 rounded-full grayscale" />
@@ -379,7 +380,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                      </div>
                      <div className="flex items-start gap-2">
                        <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
-                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.activeDays} active days across {stats.analysisYear ?? 2025} → Consistent execution</span>
+                       <span className="text-[10px] text-[#c9d1d9] font-light">{stats.activeDays} active days across {stats.analysisYear ?? getFallbackYear()} → Consistent execution</span>
                      </div>
                      <div className="flex items-start gap-2">
                        <span className="text-[#39d353] text-[10px] mt-0.5">•</span>
@@ -523,7 +524,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ stats, insights, onReset }) => {
                {/* Copy Personalized Text */}
                <button
                  onClick={() => {
-                   const year = stats.analysisYear ?? 2025;
+                   const year = stats.analysisYear ?? getFallbackYear();
                    const personalizedText = `${hooks[activeHook].text}\n\n🎬 Just got my DevWrapped ${year} results!\n\nArchetype: ${insights.archetype}\n"${insights.archetypeDescription}"\n\n${year} Highlights:\n• ${stats.totalCommits} contributions across ${stats.activeDays} active days\n• ${stats.streak} day longest streak\n• Top languages: ${stats.topLanguages.map(l => l.name).join(', ')}\n\nThe AI insights were surprisingly accurate! Try yours at https://devwrapped.netlify.app\n\n#DevWrapped${year} #YearInCode #GitHub #DeveloperStory`;
                    navigator.clipboard.writeText(personalizedText);
                    

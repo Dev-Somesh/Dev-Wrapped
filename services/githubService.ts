@@ -16,7 +16,7 @@ const fetchFromGitHub = async (endpoint: string, username: string, timeoutMs: nu
   const response = await fetch(url, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
-      'User-Agent': 'DevWrapped-2025',
+      'User-Agent': 'DevWrapped',
     },
     signal,
   });
@@ -412,12 +412,9 @@ export const fetchGitHubData = async (username: string, selectedYear?: number): 
       stars: repo.stargazers_count
     }));
 
-    // Count repos created in 2024/2025
-    const currentYear = new Date().getFullYear();
     const reposCreatedThisYear = repos.filter((repo: any) => {
       if (!repo.created_at) return false;
-      const createdYear = new Date(repo.created_at).getFullYear();
-      return createdYear === currentYear || createdYear === 2024; // Include both 2024 and current year
+      return new Date(repo.created_at).getFullYear() === analysisYear;
     }).length;
 
     // Calculate total stars received across all repos
@@ -539,16 +536,18 @@ export const fetchGitHubData = async (username: string, selectedYear?: number): 
     });
     const mostActiveMonth = Object.entries(monthCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'October';
 
-    // OPTIMIZATION: Commit search for 2025 - run it last and make it optional
-    // Use a shorter timeout since we already have most data
+    // Commit search scoped to the analysis year (primary source for past-year totals)
     let totalCommits = 0;
     try {
-      // Search for commits from selected year (public repos only)
+      const commitDateQuery =
+        analysisYear === new Date().getFullYear()
+          ? `committer-date:>=${analysisYear}-01-01`
+          : `committer-date:${analysisYear}-01-01..${analysisYear}-12-31`;
       const commitSearchResult = await Promise.race([
         fetchViaProxy(
-          `/search/commits?q=author:${username}+committer-date:>=${analysisYear}-01-01&per_page=1`,
+          `/search/commits?q=author:${username}+${commitDateQuery}&per_page=1`,
           username,
-          5000 // Shorter timeout - this is the slowest endpoint
+          5000
         ),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Commit search timeout')), 5000)

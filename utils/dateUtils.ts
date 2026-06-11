@@ -1,80 +1,78 @@
 // utils/dateUtils.ts
 export interface YearAvailability {
   currentYear: number;
+  previousYear: number;
   daysSinceYearStart: number;
-  canShowCurrentYearOnly: boolean;
-  canShowYearSelection: boolean;
   availableYears: number[];
-  dataLimitation: string;
+  defaultYear: number;
+  eventsApiLimitDays: number;
 }
+
+export const getFallbackYear = (): number => new Date().getFullYear();
+
+const GITHUB_EVENTS_LIMIT_DAYS = 90;
 
 export const calculateYearAvailability = (): YearAvailability => {
   const today = new Date();
   const currentYear = today.getFullYear();
-  const yearStart = new Date(currentYear, 0, 1); // January 1st of current year
-  
-  // Calculate days since January 1st of current year
-  const daysSinceYearStart = Math.floor((today.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // GitHub Events API limitation: 90 days
-  const GITHUB_EVENTS_LIMIT_DAYS = 90;
-  
-  if (daysSinceYearStart >= GITHUB_EVENTS_LIMIT_DAYS) {
-    // We're past 90 days from year start
-    // GitHub API will only show current year data (last 90 days)
-    return {
-      currentYear,
-      daysSinceYearStart,
-      canShowCurrentYearOnly: true,
-      canShowYearSelection: false,
-      availableYears: [currentYear],
-      dataLimitation: `GitHub API limited to last 90 days. Showing ${currentYear} data only.`
-    };
-  } else {
-    // We're within 90 days of year start
-    // GitHub API will show mixed data from current year + previous year
-    const daysFromPreviousYear = GITHUB_EVENTS_LIMIT_DAYS - daysSinceYearStart;
-    const previousYear = currentYear - 1;
-    
-    return {
-      currentYear,
-      daysSinceYearStart,
-      canShowCurrentYearOnly: false,
-      canShowYearSelection: true,
-      availableYears: [currentYear, previousYear],
-      dataLimitation: `GitHub API shows last 90 days: ${daysSinceYearStart} days from ${currentYear} + ${daysFromPreviousYear} days from ${previousYear}.`
-    };
-  }
+  const previousYear = currentYear - 1;
+  const yearStart = new Date(currentYear, 0, 1);
+
+  const daysSinceYearStart = Math.floor(
+    (today.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  // Offer the current year plus recent history (older years rely on commit
+  // search, so quality degrades — getYearDisplayInfo labels them honestly)
+  const YEARS_OFFERED = 5;
+  const availableYears = Array.from({ length: YEARS_OFFERED }, (_, i) => currentYear - i);
+
+  // After January, default to previous year (full-year wrap); early Jan defaults to current year
+  const defaultYear = daysSinceYearStart > 31 ? previousYear : currentYear;
+
+  return {
+    currentYear,
+    previousYear,
+    daysSinceYearStart,
+    availableYears,
+    defaultYear,
+    eventsApiLimitDays: GITHUB_EVENTS_LIMIT_DAYS,
+  };
 };
 
-export const getYearDisplayInfo = (selectedYear: number): { 
-  isCurrentYear: boolean; 
-  dataQuality: 'full' | 'partial' | 'mixed';
+export const getYearDisplayInfo = (selectedYear: number): {
+  isCurrentYear: boolean;
+  dataQuality: 'full' | 'partial' | 'estimated';
   description: string;
 } => {
-  const { currentYear, daysSinceYearStart, canShowCurrentYearOnly } = calculateYearAvailability();
-  
+  const { currentYear, daysSinceYearStart, eventsApiLimitDays } = calculateYearAvailability();
+
   if (selectedYear === currentYear) {
-    if (canShowCurrentYearOnly) {
+    if (daysSinceYearStart <= eventsApiLimitDays) {
       return {
         isCurrentYear: true,
         dataQuality: 'partial',
-        description: `${currentYear} data (last 90 days only due to GitHub API limits)`
-      };
-    } else {
-      return {
-        isCurrentYear: true,
-        dataQuality: 'partial',
-        description: `${currentYear} data (${daysSinceYearStart} days available)`
+        description: `${currentYear} YTD (${daysSinceYearStart} days) — events API + commit search`,
       };
     }
-  } else {
-    // Previous year selected
-    const daysFromPreviousYear = 90 - daysSinceYearStart;
     return {
-      isCurrentYear: false,
-      dataQuality: 'mixed',
-      description: `${selectedYear} data (last ${daysFromPreviousYear} days only, mixed with ${currentYear})`
+      isCurrentYear: true,
+      dataQuality: 'partial',
+      description: `${currentYear} — events limited to last ${eventsApiLimitDays} days; commit search for totals`,
     };
   }
+
+  if (selectedYear === currentYear - 1) {
+    return {
+      isCurrentYear: false,
+      dataQuality: 'estimated',
+      description: `${selectedYear} full year — commit search + repo activity (events API ~${eventsApiLimitDays}-day window)`,
+    };
+  }
+
+  return {
+    isCurrentYear: false,
+    dataQuality: 'estimated',
+    description: `${selectedYear} — estimated from commit history (events API doesn't cover past years)`,
+  };
 };
