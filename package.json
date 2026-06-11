@@ -7,13 +7,14 @@
     "dev": "vite",
     "dev:netlify": "netlify dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
     "@microsoft/clarity": "^1.0.2",
     "@netlify/functions": "^2.4.1",
-    "html-to-image": "1.11.11",
+    "html-to-image": "1.11.13",
     "mixpanel-browser": "^2.73.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
